@@ -22,7 +22,7 @@ class JobApplicationListSerializer(serializers.ModelSerializer):
         fields = [
             'id', 'company_name', 'position_title', 'status', 'status_display',
             'date_applied', 'job_type', 'job_type_display', 'location',
-            'work_location_type', 'work_location_type_display',
+            'work_location_type', 'work_location_type_display', 'job_description',
             'follow_up_date', 'needs_follow_up', 'is_overdue'
         ]
 
