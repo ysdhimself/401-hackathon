@@ -79,7 +79,10 @@ export function Dashboard() {
               Use full form →
             </Link>
           </div>
-          <form onSubmit={handleQuickSubmit} className="grid grid-cols-1 md:grid-cols-4 gap-4 items-end">
+          <form
+            onSubmit={handleQuickSubmit}
+            className="grid grid-cols-1 md:grid-cols-4 gap-4 items-end"
+          >
             <div>
               <label className="label">Company *</label>
               <input
@@ -91,7 +94,7 @@ export function Dashboard() {
                 placeholder="Acme Corp"
               />
             </div>
-            <div>
+            <div className="w-full min-w-0">
               <label className="label">Position *</label>
               <input
                 name="position_title"
@@ -102,7 +105,7 @@ export function Dashboard() {
                 placeholder="Product Manager"
               />
             </div>
-            <div>
+            <div className="w-full min-w-0">
               <label className="label">Status</label>
               <select
                 name="status"
@@ -117,7 +120,7 @@ export function Dashboard() {
                 ))}
               </select>
             </div>
-            <div>
+            <div className="w-full min-w-0">
               <label className="label">Date Applied</label>
               <input
                 type="date"
@@ -128,7 +131,7 @@ export function Dashboard() {
                 required
               />
             </div>
-            <div className="md:col-span-4 flex gap-3">
+            <div className="md:col-span-4 flex flex-col sm:flex-row gap-3">
               <button
                 type="submit"
                 className="btn btn-primary"

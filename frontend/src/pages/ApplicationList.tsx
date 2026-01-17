@@ -101,17 +101,11 @@ export function ApplicationList() {
                     {app.follow_up_date && (
                       <div>Follow-up {formatDate(app.follow_up_date)}</div>
                     )}
-                    <div className="mt-2 flex gap-3 md:justify-end">
-                      <Link
-                        to={`/applications/${app.id}`}
-                        className="text-blue-600 hover:underline text-sm"
-                      >
+                    <div className="mt-2 flex gap-2 md:justify-end">
+                      <Link to={`/applications/${app.id}`} className="btn btn-secondary btn-sm">
                         View
                       </Link>
-                      <Link
-                        to={`/applications/${app.id}/edit`}
-                        className="text-gray-600 hover:underline text-sm"
-                      >
+                      <Link to={`/applications/${app.id}/edit`} className="btn btn-primary btn-sm">
                         Edit
                       </Link>
                     </div>
