@@ -1,0 +1,26 @@
+Job Application Follow-up Reminders
+=====================================
+
+You have {{ applications|length }} application(s) that need follow-up:
+
+{% if overdue %}
+OVERDUE ({{ overdue|length }})
+--------------
+{% for app in overdue %}
+* {{ app.company_name }} - {{ app.position_title }}
+  Follow-up was due: {{ app.follow_up_date|date:"F d, Y" }}
+
+{% endfor %}
+{% endif %}
+{% if upcoming %}
+UPCOMING ({{ upcoming|length }})
+--------------
+{% for app in upcoming %}
+* {{ app.company_name }} - {{ app.position_title }}
+  Follow-up date: {{ app.follow_up_date|date:"F d, Y" }}
+
+{% endfor %}
+{% endif %}
+---
+This reminder was sent by Job Application Tracker.
+Generated on {{ today|date:"F d, Y" }}
