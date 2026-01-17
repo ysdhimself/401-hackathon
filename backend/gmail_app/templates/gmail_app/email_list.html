@@ -1,62 +1,72 @@
-<!DOCTYPE html>
-<html lang="en">
-  <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Recent Emails</title>
-    <style>
-      body {
-        margin: 0;
-        font-family: "Georgia", "Times New Roman", serif;
-        background: #f8f4ee;
-        color: #1b1b1b;
-      }
-      .wrap {
-        max-width: 720px;
-        margin: 48px auto;
-        padding: 0 24px;
-      }
-      h1 {
-        margin-bottom: 24px;
-        font-size: 28px;
-      }
-      ul {
-        list-style: none;
-        padding: 0;
-        margin: 0;
-      }
-      li {
-        background: #ffffff;
-        padding: 16px 20px;
-        border-radius: 12px;
-        box-shadow: 0 8px 18px rgba(0, 0, 0, 0.08);
-        margin-bottom: 12px;
-      }
-      .subject {
-        font-weight: 600;
-      }
-      .meta {
-        font-size: 14px;
-        color: #5a5a5a;
-        margin-top: 6px;
-      }
-    </style>
-  </head>
-  <body>
-    <div class="wrap">
-      <h1>Latest Email Subjects</h1>
-      {% if messages %}
-        <ul>
-          {% for message in messages %}
-            <li>
-              <div class="subject">{{ message.subject|default:"(No subject)" }}</div>
-              <div class="meta">{{ message.sender }}</div>
-            </li>
-          {% endfor %}
-        </ul>
-      {% else %}
-        <p>No emails fetched yet. Run the fetch endpoint first.</p>
-      {% endif %}
+{% extends 'base.html' %}
+
+{% block title %}Gmail Emails - Job Tracker{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1 class="page-title">Recent Emails</h1>
+    <div class="d-flex gap-1">
+        <button class="btn btn-primary" id="refresh-btn">Refresh Emails</button>
     </div>
-  </body>
-</html>
+</div>
+
+{% if messages %}
+<div class="card">
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Subject</th>
+                <th>From</th>
+                <th>Received</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for message in messages %}
+            <tr>
+                <td><strong>{{ message.subject|default:"(No subject)" }}</strong></td>
+                <td>{{ message.sender }}</td>
+                <td>{{ message.received_at|date:"M d, Y H:i" }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% else %}
+<div class="card" style="text-align: center; padding: 3rem;">
+    <p style="color: #7f8c8d; margin-bottom: 1rem;">No emails fetched yet.</p>
+    <button class="btn btn-primary" id="fetch-btn">Fetch Emails Now</button>
+</div>
+{% endif %}
+
+<script>
+    async function fetchEmails() {
+        const btn = document.getElementById('refresh-btn') || document.getElementById('fetch-btn');
+        if (btn) {
+            btn.disabled = true;
+            btn.textContent = 'Fetching...';
+        }
+        try {
+            const response = await fetch("{% url 'gmail:fetch-emails' %}");
+            const data = await response.json();
+            if (data.error) {
+                alert(data.error);
+            } else {
+                window.location.reload();
+            }
+        } catch (error) {
+            console.error(error);
+            alert('Failed to fetch emails');
+        } finally {
+            if (btn) {
+                btn.disabled = false;
+                btn.textContent = 'Refresh Emails';
+            }
+        }
+    }
+
+    const refreshBtn = document.getElementById('refresh-btn');
+    const fetchBtn = document.getElementById('fetch-btn');
+    if (refreshBtn) refreshBtn.addEventListener('click', fetchEmails);
+    if (fetchBtn) fetchBtn.addEventListener('click', fetchEmails);
+</script>
+{% endblock %}

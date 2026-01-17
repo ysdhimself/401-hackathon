@@ -74,7 +74,7 @@ def google_callback(request):
     return render(
         request,
         'gmail_app/connected.html',
-        {'email': email, 'emails_url': reverse('email-list-page')},
+        {'email': email, 'emails_url': reverse('gmail:email-list-page')},
     )
 
 
