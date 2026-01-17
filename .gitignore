@@ -12,3 +12,5 @@ setup.sh
 node_modules/
 .DS_Store
 *.log
+*.md
+!README.md
