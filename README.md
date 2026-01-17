@@ -1,6 +1,6 @@
 Job Application Analyzer Project placeholder
 
-Backend OAuth + Gmail MVP
+## Backend OAuth + Gmail MVP
 
 Setup
 1) Create a virtual environment and install dependencies (Django).
@@ -38,3 +38,8 @@ Env vars
 - GET /api/auth/google/callback
 - GET /api/emails/fetch
 - GET /api/emails/page -->
+
+---
+
+## Adding the firebase JSON FIle
+1) in the secrets folder place the firebase.json inside there.
