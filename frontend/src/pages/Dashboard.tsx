@@ -81,9 +81,9 @@ export function Dashboard() {
           </div>
           <form
             onSubmit={handleQuickSubmit}
-            className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-x-6 gap-y-5 items-end"
+            className="grid grid-cols-1 md:grid-cols-4 gap-4 items-end"
           >
-            <div className="w-full min-w-0">
+            <div>
               <label className="label">Company *</label>
               <input
                 name="company_name"
@@ -131,7 +131,7 @@ export function Dashboard() {
                 required
               />
             </div>
-            <div className="col-span-full flex gap-3">
+            <div className="md:col-span-4 flex flex-col sm:flex-row gap-3">
               <button
                 type="submit"
                 className="btn btn-primary"

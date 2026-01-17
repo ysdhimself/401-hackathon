@@ -7,11 +7,11 @@ export function Navbar() {
   const followUpCount = followUps?.length || 0;
 
   return (
-    <nav className="bg-slate-800 px-8 py-4 flex justify-between items-center">
+    <nav className="bg-slate-800 px-4 md:px-8 py-4 flex flex-col md:flex-row md:justify-between md:items-center gap-3">
       <Link to="/" className="text-white text-xl font-bold">
         Job Tracker
       </Link>
-      <ul className="flex gap-2">
+      <ul className="flex flex-wrap gap-2">
         <NavItem to="/">Dashboard</NavItem>
         <NavItem to="/applications">All Applications</NavItem>
         <NavItem to="/follow-ups">
