@@ -19,8 +19,8 @@ from django.urls import path, include
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    # Legacy template-based views (can be removed once React is fully working)
-    path('', include('applications.urls')),
+    # Legacy template-based views (moved off root to avoid confusion with React)
+    path(' ', include('applications.urls')),
     path('gmail/', include('gmail_app.urls')),
     # REST API endpoints for React frontend
     path('api/', include('applications.api_urls')),

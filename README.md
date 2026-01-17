@@ -1,5 +1,6 @@
 # Job Finder
 
+## Backend OAuth + Gmail MVP
 Django REST backend with a React (Vite + Tailwind) frontend for tracking job applications, follow-ups, and Gmail-powered email ingestion.
 
 ## Prerequisites
@@ -20,6 +21,17 @@ Helpful commands:
 - `python manage.py makemigrations` / `python manage.py migrate`
 - `python manage.py test`
 
+<!-- Endpoints
+- GET /api/
+- GET /api/auth/google/login
+- GET /api/auth/google/callback
+- GET /api/emails/fetch
+- GET /api/emails/page -->
+
+---
+
+## Adding the firebase JSON FIle
+1) in the secrets folder place the firebase.json inside there.
 ## Frontend (React)
 ```bash
 cd frontend
