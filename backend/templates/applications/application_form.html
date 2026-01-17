@@ -1,0 +1,170 @@
+{% extends 'base.html' %}
+
+{% block title %}{% if object %}Edit Application{% else %}New Application{% endif %} - Job Application Tracker{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1 class="page-title">{% if object %}Edit Application{% else %}New Application{% endif %}</h1>
+</div>
+
+<div class="card">
+    <form method="post">
+        {% csrf_token %}
+
+        {% if form.non_field_errors %}
+        <div class="alert alert-error mb-2">
+            {% for error in form.non_field_errors %}
+            <p>{{ error }}</p>
+            {% endfor %}
+        </div>
+        {% endif %}
+
+        <!-- Basic Information -->
+        <h3 class="mb-2">Basic Information</h3>
+        <div class="grid grid-2 mb-3">
+            <div class="form-group">
+                <label for="id_company_name">Company Name *</label>
+                <input type="text" name="company_name" id="id_company_name" class="form-control"
+                       value="{{ form.company_name.value|default:'' }}" required>
+                {% if form.company_name.errors %}
+                <small class="text-danger">{{ form.company_name.errors.0 }}</small>
+                {% endif %}
+            </div>
+            <div class="form-group">
+                <label for="id_position_title">Position Title *</label>
+                <input type="text" name="position_title" id="id_position_title" class="form-control"
+                       value="{{ form.position_title.value|default:'' }}" required>
+                {% if form.position_title.errors %}
+                <small class="text-danger">{{ form.position_title.errors.0 }}</small>
+                {% endif %}
+            </div>
+            <div class="form-group">
+                <label for="id_status">Status</label>
+                <select name="status" id="id_status" class="form-control">
+                    {% for value, label in form.fields.status.choices %}
+                    <option value="{{ value }}" {% if form.status.value == value %}selected{% endif %}>{{ label }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="id_date_applied">Date Applied</label>
+                <input type="date" name="date_applied" id="id_date_applied" class="form-control"
+                       value="{{ form.date_applied.value|date:'Y-m-d' }}">
+            </div>
+        </div>
+
+        <!-- Job Details -->
+        <h3 class="mb-2">Job Details</h3>
+        <div class="grid grid-3 mb-2">
+            <div class="form-group">
+                <label for="id_job_type">Job Type</label>
+                <select name="job_type" id="id_job_type" class="form-control">
+                    {% for value, label in form.fields.job_type.choices %}
+                    <option value="{{ value }}" {% if form.job_type.value == value %}selected{% endif %}>{{ label }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="id_work_location_type">Work Location Type</label>
+                <select name="work_location_type" id="id_work_location_type" class="form-control">
+                    {% for value, label in form.fields.work_location_type.choices %}
+                    <option value="{{ value }}" {% if form.work_location_type.value == value %}selected{% endif %}>{{ label }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="id_location">Location</label>
+                <input type="text" name="location" id="id_location" class="form-control"
+                       value="{{ form.location.value|default:'' }}" placeholder="e.g., San Francisco, CA">
+            </div>
+        </div>
+        <div class="form-group mb-2">
+            <label for="id_job_url">Job URL</label>
+            <input type="url" name="job_url" id="id_job_url" class="form-control"
+                   value="{{ form.job_url.value|default:'' }}" placeholder="https://...">
+        </div>
+        <div class="form-group mb-3">
+            <label for="id_job_description">Job Description</label>
+            <textarea name="job_description" id="id_job_description" class="form-control" rows="4">{{ form.job_description.value|default:'' }}</textarea>
+        </div>
+
+        <!-- Salary -->
+        <h3 class="mb-2">Salary</h3>
+        <div class="grid grid-2 mb-3">
+            <div class="form-group">
+                <label for="id_salary_min">Minimum Salary</label>
+                <input type="number" name="salary_min" id="id_salary_min" class="form-control"
+                       value="{{ form.salary_min.value|default:'' }}" step="0.01" min="0" placeholder="e.g., 80000">
+            </div>
+            <div class="form-group">
+                <label for="id_salary_max">Maximum Salary</label>
+                <input type="number" name="salary_max" id="id_salary_max" class="form-control"
+                       value="{{ form.salary_max.value|default:'' }}" step="0.01" min="0" placeholder="e.g., 120000">
+            </div>
+        </div>
+
+        <!-- Contact Information -->
+        <h3 class="mb-2">Contact Information</h3>
+        <div class="grid grid-3 mb-3">
+            <div class="form-group">
+                <label for="id_contact_name">Contact Name</label>
+                <input type="text" name="contact_name" id="id_contact_name" class="form-control"
+                       value="{{ form.contact_name.value|default:'' }}">
+            </div>
+            <div class="form-group">
+                <label for="id_contact_email">Contact Email</label>
+                <input type="email" name="contact_email" id="id_contact_email" class="form-control"
+                       value="{{ form.contact_email.value|default:'' }}">
+            </div>
+            <div class="form-group">
+                <label for="id_contact_phone">Contact Phone</label>
+                <input type="text" name="contact_phone" id="id_contact_phone" class="form-control"
+                       value="{{ form.contact_phone.value|default:'' }}">
+            </div>
+        </div>
+
+        <!-- Follow-up -->
+        <h3 class="mb-2">Follow-up</h3>
+        <div class="grid grid-2 mb-3">
+            <div class="form-group">
+                <label for="id_follow_up_date">Follow-up Date</label>
+                <input type="date" name="follow_up_date" id="id_follow_up_date" class="form-control"
+                       value="{{ form.follow_up_date.value|date:'Y-m-d' }}">
+            </div>
+            <div class="form-group">
+                <label for="id_reminder_days_before">Remind Me (days before)</label>
+                <input type="number" name="reminder_days_before" id="id_reminder_days_before" class="form-control"
+                       value="{{ form.reminder_days_before.value|default:1 }}" min="0">
+            </div>
+        </div>
+
+        <!-- Additional Info -->
+        <h3 class="mb-2">Additional Information</h3>
+        <div class="grid grid-2 mb-2">
+            <div class="form-group">
+                <label for="id_resume_version">Resume Version</label>
+                <input type="text" name="resume_version" id="id_resume_version" class="form-control"
+                       value="{{ form.resume_version.value|default:'' }}" placeholder="e.g., v2.1, Software Engineer Resume">
+            </div>
+            <div class="form-group">
+                <label for="id_cover_letter_sent">Cover Letter</label>
+                <div class="checkbox-wrapper" style="margin-top: 0.5rem;">
+                    <input type="checkbox" name="cover_letter_sent" id="id_cover_letter_sent"
+                           {% if form.cover_letter_sent.value %}checked{% endif %}>
+                    <label for="id_cover_letter_sent">Cover letter sent</label>
+                </div>
+            </div>
+        </div>
+        <div class="form-group mb-3">
+            <label for="id_notes">Notes</label>
+            <textarea name="notes" id="id_notes" class="form-control" rows="4">{{ form.notes.value|default:'' }}</textarea>
+        </div>
+
+        <!-- Submit -->
+        <div class="d-flex gap-1">
+            <button type="submit" class="btn btn-success">{% if object %}Save Changes{% else %}Create Application{% endif %}</button>
+            <a href="{% if object %}{% url 'applications:application_detail' object.pk %}{% else %}{% url 'applications:application_list' %}{% endif %}" class="btn btn-secondary">Cancel</a>
+        </div>
+    </form>
+</div>
+{% endblock %}

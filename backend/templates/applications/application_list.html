@@ -1,0 +1,141 @@
+{% extends 'base.html' %}
+
+{% block title %}All Applications - Job Application Tracker{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1 class="page-title">All Applications</h1>
+    <a href="{% url 'applications:application_create' %}" class="btn btn-primary">+ New Application</a>
+</div>
+
+<!-- Filters -->
+<div class="card mb-2">
+    <form method="get" class="filter-form">
+        <div class="form-group">
+            <label for="id_search">Search</label>
+            <input type="text" name="search" id="id_search" class="form-control"
+                   placeholder="Company or position..." value="{{ request.GET.search }}">
+        </div>
+        <div class="form-group">
+            <label for="id_status">Status</label>
+            <select name="status" id="id_status" class="form-control">
+                <option value="">All Statuses</option>
+                <option value="applied" {% if request.GET.status == 'applied' %}selected{% endif %}>Applied</option>
+                <option value="phone_screen" {% if request.GET.status == 'phone_screen' %}selected{% endif %}>Phone Screen</option>
+                <option value="interview" {% if request.GET.status == 'interview' %}selected{% endif %}>Interview</option>
+                <option value="technical" {% if request.GET.status == 'technical' %}selected{% endif %}>Technical Interview</option>
+                <option value="onsite" {% if request.GET.status == 'onsite' %}selected{% endif %}>On-site Interview</option>
+                <option value="offered" {% if request.GET.status == 'offered' %}selected{% endif %}>Offered</option>
+                <option value="accepted" {% if request.GET.status == 'accepted' %}selected{% endif %}>Accepted</option>
+                <option value="rejected" {% if request.GET.status == 'rejected' %}selected{% endif %}>Rejected</option>
+                <option value="withdrawn" {% if request.GET.status == 'withdrawn' %}selected{% endif %}>Withdrawn</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label for="id_job_type">Job Type</label>
+            <select name="job_type" id="id_job_type" class="form-control">
+                <option value="">All Types</option>
+                <option value="full_time" {% if request.GET.job_type == 'full_time' %}selected{% endif %}>Full-time</option>
+                <option value="part_time" {% if request.GET.job_type == 'part_time' %}selected{% endif %}>Part-time</option>
+                <option value="contract" {% if request.GET.job_type == 'contract' %}selected{% endif %}>Contract</option>
+                <option value="internship" {% if request.GET.job_type == 'internship' %}selected{% endif %}>Internship</option>
+                <option value="freelance" {% if request.GET.job_type == 'freelance' %}selected{% endif %}>Freelance</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label for="id_work_location_type">Location Type</label>
+            <select name="work_location_type" id="id_work_location_type" class="form-control">
+                <option value="">All Locations</option>
+                <option value="remote" {% if request.GET.work_location_type == 'remote' %}selected{% endif %}>Remote</option>
+                <option value="onsite" {% if request.GET.work_location_type == 'onsite' %}selected{% endif %}>On-site</option>
+                <option value="hybrid" {% if request.GET.work_location_type == 'hybrid' %}selected{% endif %}>Hybrid</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label for="id_date_from">From Date</label>
+            <input type="date" name="date_from" id="id_date_from" class="form-control" value="{{ request.GET.date_from }}">
+        </div>
+        <div class="form-group">
+            <label for="id_date_to">To Date</label>
+            <input type="date" name="date_to" id="id_date_to" class="form-control" value="{{ request.GET.date_to }}">
+        </div>
+        <div class="form-group">
+            <button type="submit" class="btn btn-primary">Filter</button>
+            <a href="{% url 'applications:application_list' %}" class="btn btn-secondary">Clear</a>
+        </div>
+    </form>
+</div>
+
+<!-- Applications Table -->
+<div class="card">
+    {% if applications %}
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Company</th>
+                <th>Position</th>
+                <th>Status</th>
+                <th>Type</th>
+                <th>Location</th>
+                <th>Date Applied</th>
+                <th>Follow-up</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for app in applications %}
+            <tr class="{% if app.is_overdue %}overdue{% endif %}">
+                <td>
+                    <a href="{% url 'applications:application_detail' app.pk %}">{{ app.company_name }}</a>
+                </td>
+                <td>{{ app.position_title }}</td>
+                <td><span class="status-badge status-{{ app.status }}">{{ app.get_status_display }}</span></td>
+                <td>{{ app.get_job_type_display }}</td>
+                <td>
+                    {% if app.location %}{{ app.location }} - {% endif %}{{ app.get_work_location_type_display }}
+                </td>
+                <td>{{ app.date_applied|date:"M d, Y" }}</td>
+                <td>
+                    {% if app.follow_up_date %}
+                        <span class="{% if app.is_overdue %}text-danger{% endif %}">
+                            {{ app.follow_up_date|date:"M d, Y" }}
+                        </span>
+                    {% else %}
+                        -
+                    {% endif %}
+                </td>
+                <td>
+                    <a href="{% url 'applications:application_update' app.pk %}" class="btn btn-sm btn-secondary">Edit</a>
+                    <a href="{% url 'applications:application_delete' app.pk %}" class="btn btn-sm btn-danger">Delete</a>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <!-- Pagination -->
+    {% if page_obj.has_other_pages %}
+    <div class="pagination">
+        {% if page_obj.has_previous %}
+            <a href="?page=1{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}">First</a>
+            <a href="?page={{ page_obj.previous_page_number }}{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}">Previous</a>
+        {% endif %}
+
+        <span class="current">
+            Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}
+        </span>
+
+        {% if page_obj.has_next %}
+            <a href="?page={{ page_obj.next_page_number }}{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}">Next</a>
+            <a href="?page={{ page_obj.paginator.num_pages }}{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}">Last</a>
+        {% endif %}
+    </div>
+    {% endif %}
+    {% else %}
+    <p class="text-muted" style="padding: 2rem; text-align: center;">
+        No applications found.
+        <a href="{% url 'applications:application_create' %}">Add your first application</a>
+    </p>
+    {% endif %}
+</div>
+{% endblock %}

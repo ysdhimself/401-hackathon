@@ -1,0 +1,145 @@
+{% extends 'base.html' %}
+
+{% block title %}Dashboard - Job Application Tracker{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1 class="page-title">Dashboard</h1>
+    <a href="{% url 'applications:application_create' %}" class="btn btn-primary">+ New Application</a>
+</div>
+
+<!-- Statistics -->
+<div class="grid grid-4 mb-3">
+    <div class="card stat-card">
+        <div class="stat-number">{{ total_applications }}</div>
+        <div class="stat-label">Total Applications</div>
+    </div>
+    <div class="card stat-card">
+        <div class="stat-number">{{ applied_count }}</div>
+        <div class="stat-label">Applied</div>
+    </div>
+    <div class="card stat-card">
+        <div class="stat-number">{{ interviewing_count }}</div>
+        <div class="stat-label">Interviewing</div>
+    </div>
+    <div class="card stat-card">
+        <div class="stat-number">{{ offers_count }}</div>
+        <div class="stat-label">Offers</div>
+    </div>
+</div>
+
+<div class="grid grid-2">
+    <!-- Quick Add -->
+    <div class="card">
+        <div class="card-header">
+            <h2 class="card-title">Quick Add Application</h2>
+        </div>
+        <form method="post">
+            {% csrf_token %}
+            <div class="form-group">
+                <label for="id_company_name">Company Name *</label>
+                <input type="text" name="company_name" id="id_company_name" class="form-control" required>
+            </div>
+            <div class="form-group">
+                <label for="id_position_title">Position Title *</label>
+                <input type="text" name="position_title" id="id_position_title" class="form-control" required>
+            </div>
+            <div class="form-group">
+                <label for="id_job_url">Job URL</label>
+                <input type="url" name="job_url" id="id_job_url" class="form-control" placeholder="https://...">
+            </div>
+            <div class="grid grid-2">
+                <div class="form-group">
+                    <label for="id_status">Status</label>
+                    <select name="status" id="id_status" class="form-control">
+                        <option value="applied" selected>Applied</option>
+                        <option value="phone_screen">Phone Screen</option>
+                        <option value="interview">Interview</option>
+                        <option value="technical">Technical Interview</option>
+                        <option value="onsite">On-site Interview</option>
+                        <option value="offered">Offered</option>
+                        <option value="accepted">Accepted</option>
+                        <option value="rejected">Rejected</option>
+                        <option value="withdrawn">Withdrawn</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="id_date_applied">Date Applied</label>
+                    <input type="date" name="date_applied" id="id_date_applied" class="form-control" value="{{ today|date:'Y-m-d' }}">
+                </div>
+            </div>
+            <button type="submit" class="btn btn-success">Add Application</button>
+        </form>
+    </div>
+
+    <!-- Pending Follow-ups -->
+    <div class="card">
+        <div class="card-header d-flex justify-between align-center">
+            <h2 class="card-title">Pending Follow-ups</h2>
+            <a href="{% url 'applications:followup_list' %}" class="btn btn-sm btn-secondary">View All</a>
+        </div>
+        {% if pending_followups %}
+        <ul style="list-style: none;">
+            {% for app in pending_followups|slice:":5" %}
+            <li class="{% if app.is_overdue %}overdue{% endif %}" style="padding: 0.75rem; border-bottom: 1px solid #eee;">
+                <div class="d-flex justify-between align-center">
+                    <div>
+                        <a href="{% url 'applications:application_detail' app.pk %}" style="text-decoration: none; color: #2c3e50; font-weight: 500;">
+                            {{ app.position_title }}
+                        </a>
+                        <div class="text-muted" style="font-size: 0.875rem;">{{ app.company_name }}</div>
+                    </div>
+                    <div style="text-align: right;">
+                        <div class="{% if app.is_overdue %}text-danger{% endif %}" style="font-weight: 500;">
+                            {{ app.follow_up_date|date:"M d, Y" }}
+                        </div>
+                        {% if app.is_overdue %}
+                        <div class="text-danger" style="font-size: 0.75rem;">OVERDUE</div>
+                        {% endif %}
+                    </div>
+                </div>
+            </li>
+            {% endfor %}
+        </ul>
+        {% else %}
+        <p class="text-muted">No pending follow-ups.</p>
+        {% endif %}
+    </div>
+</div>
+
+<!-- Recent Applications -->
+<div class="card mt-2">
+    <div class="card-header d-flex justify-between align-center">
+        <h2 class="card-title">Recent Applications</h2>
+        <a href="{% url 'applications:application_list' %}" class="btn btn-sm btn-secondary">View All</a>
+    </div>
+    {% if recent_applications %}
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Company</th>
+                <th>Position</th>
+                <th>Status</th>
+                <th>Date Applied</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for app in recent_applications %}
+            <tr>
+                <td><a href="{% url 'applications:application_detail' app.pk %}">{{ app.company_name }}</a></td>
+                <td>{{ app.position_title }}</td>
+                <td><span class="status-badge status-{{ app.status }}">{{ app.get_status_display }}</span></td>
+                <td>{{ app.date_applied|date:"M d, Y" }}</td>
+                <td>
+                    <a href="{% url 'applications:application_update' app.pk %}" class="btn btn-sm btn-secondary">Edit</a>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+    <p class="text-muted">No applications yet. Add your first one above!</p>
+    {% endif %}
+</div>
+{% endblock %}

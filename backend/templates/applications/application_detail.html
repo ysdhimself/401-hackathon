@@ -1,0 +1,178 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ application.position_title }} at {{ application.company_name }} - Job Application Tracker{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <div>
+        <h1 class="page-title">{{ application.position_title }}</h1>
+        <p class="text-muted">{{ application.company_name }}</p>
+    </div>
+    <div class="d-flex gap-1">
+        <a href="{% url 'applications:application_update' application.pk %}" class="btn btn-primary">Edit</a>
+        <a href="{% url 'applications:application_delete' application.pk %}" class="btn btn-danger">Delete</a>
+    </div>
+</div>
+
+<div class="grid grid-2">
+    <!-- Main Info -->
+    <div>
+        <div class="card">
+            <div class="card-header">
+                <h2 class="card-title">Application Details</h2>
+            </div>
+            <div class="detail-grid">
+                <div class="detail-label">Status</div>
+                <div><span class="status-badge status-{{ application.status }}">{{ application.get_status_display }}</span></div>
+
+                <div class="detail-label">Date Applied</div>
+                <div>{{ application.date_applied|date:"F d, Y" }}</div>
+
+                <div class="detail-label">Job Type</div>
+                <div>{{ application.get_job_type_display }}</div>
+
+                <div class="detail-label">Work Location</div>
+                <div>{{ application.get_work_location_type_display }}</div>
+
+                {% if application.location %}
+                <div class="detail-label">Location</div>
+                <div>{{ application.location }}</div>
+                {% endif %}
+
+                {% if application.salary_range %}
+                <div class="detail-label">Salary Range</div>
+                <div>{{ application.salary_range }}</div>
+                {% endif %}
+
+                {% if application.job_url %}
+                <div class="detail-label">Job URL</div>
+                <div><a href="{{ application.job_url }}" target="_blank" rel="noopener">View Job Posting</a></div>
+                {% endif %}
+
+                {% if application.resume_version %}
+                <div class="detail-label">Resume Version</div>
+                <div>{{ application.resume_version }}</div>
+                {% endif %}
+
+                <div class="detail-label">Cover Letter</div>
+                <div>{% if application.cover_letter_sent %}Yes{% else %}No{% endif %}</div>
+            </div>
+        </div>
+
+        {% if application.job_description %}
+        <div class="card">
+            <div class="card-header">
+                <h2 class="card-title">Job Description</h2>
+            </div>
+            <div style="white-space: pre-wrap;">{{ application.job_description }}</div>
+        </div>
+        {% endif %}
+
+        {% if application.notes %}
+        <div class="card">
+            <div class="card-header">
+                <h2 class="card-title">Notes</h2>
+            </div>
+            <div style="white-space: pre-wrap;">{{ application.notes }}</div>
+        </div>
+        {% endif %}
+    </div>
+
+    <!-- Side Info -->
+    <div>
+        <!-- Follow-up -->
+        <div class="card {% if application.is_overdue %}overdue{% endif %}">
+            <div class="card-header">
+                <h2 class="card-title">Follow-up</h2>
+            </div>
+            {% if application.follow_up_date %}
+            <div class="detail-grid">
+                <div class="detail-label">Follow-up Date</div>
+                <div class="{% if application.is_overdue %}text-danger{% endif %}">
+                    {{ application.follow_up_date|date:"F d, Y" }}
+                    {% if application.is_overdue %}(OVERDUE){% endif %}
+                </div>
+
+                <div class="detail-label">Reminder</div>
+                <div>{{ application.reminder_days_before }} day(s) before</div>
+            </div>
+            {% else %}
+            <p class="text-muted">No follow-up date set.</p>
+            <a href="{% url 'applications:application_update' application.pk %}" class="btn btn-sm btn-secondary">Set Follow-up</a>
+            {% endif %}
+        </div>
+
+        <!-- Contact Info -->
+        {% if application.contact_name or application.contact_email or application.contact_phone %}
+        <div class="card">
+            <div class="card-header">
+                <h2 class="card-title">Contact</h2>
+            </div>
+            <div class="detail-grid">
+                {% if application.contact_name %}
+                <div class="detail-label">Name</div>
+                <div>{{ application.contact_name }}</div>
+                {% endif %}
+
+                {% if application.contact_email %}
+                <div class="detail-label">Email</div>
+                <div><a href="mailto:{{ application.contact_email }}">{{ application.contact_email }}</a></div>
+                {% endif %}
+
+                {% if application.contact_phone %}
+                <div class="detail-label">Phone</div>
+                <div><a href="tel:{{ application.contact_phone }}">{{ application.contact_phone }}</a></div>
+                {% endif %}
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- Application Notes (Timeline) -->
+        <div class="card">
+            <div class="card-header">
+                <h2 class="card-title">Activity Notes</h2>
+            </div>
+
+            <!-- Add Note Form -->
+            <form method="post" class="mb-2">
+                {% csrf_token %}
+                <div class="form-group">
+                    <textarea name="content" class="form-control" rows="3" placeholder="Add a note about this application..."></textarea>
+                </div>
+                <button type="submit" class="btn btn-sm btn-success">Add Note</button>
+            </form>
+
+            <!-- Notes List -->
+            {% if notes %}
+            <div style="border-top: 1px solid #eee; padding-top: 1rem;">
+                {% for note in notes %}
+                <div style="padding: 0.75rem 0; border-bottom: 1px solid #eee;">
+                    <div class="d-flex justify-between align-center mb-1">
+                        <span class="text-muted" style="font-size: 0.875rem;">{{ note.created_at|date:"M d, Y H:i" }}</span>
+                        <form method="post" action="{% url 'applications:delete_note' application.pk note.pk %}" style="display: inline;">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Delete this note?');">Delete</button>
+                        </form>
+                    </div>
+                    <div style="white-space: pre-wrap;">{{ note.content }}</div>
+                </div>
+                {% endfor %}
+            </div>
+            {% else %}
+            <p class="text-muted">No notes yet.</p>
+            {% endif %}
+        </div>
+
+        <!-- Timestamps -->
+        <div class="card">
+            <div class="detail-grid" style="font-size: 0.875rem;">
+                <div class="detail-label">Created</div>
+                <div>{{ application.created_at|date:"M d, Y H:i" }}</div>
+
+                <div class="detail-label">Updated</div>
+                <div>{{ application.updated_at|date:"M d, Y H:i" }}</div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
