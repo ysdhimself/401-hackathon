@@ -43,13 +43,13 @@ export default function MasterResumeDetail() {
                         download
                         className="btn btn-primary"
                     >
-                        📄 Download PDF
+                        Download PDF
                     </a>
                     <Link
                         to={`/master-resumes/${resume.id}/edit`}
                         className="btn btn-secondary"
                     >
-                        ✏️ Edit
+                        Edit
                     </Link>
                     <Link to="/master-resumes" className="btn btn-secondary">
                         ← Back

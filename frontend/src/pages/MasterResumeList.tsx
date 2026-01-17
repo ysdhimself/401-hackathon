@@ -92,7 +92,7 @@ export default function MasterResumeList() {
                                         download
                                         className="btn btn-primary text-sm"
                                     >
-                                        📄 PDF
+                                        PDF
                                     </a>
                                     <Link
                                         to={`/master-resumes/${resume.id}/edit`}
