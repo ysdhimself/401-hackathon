@@ -4,6 +4,7 @@ import type { JobApplication, JobApplicationInput } from '@/types';
 import { STATUS_OPTIONS, JOB_TYPE_OPTIONS, WORK_LOCATION_OPTIONS } from '@/types';
 import { useUIStore } from '@/stores/uiStore';
 import { getTodayString } from '@/utils/date';
+import { useMasterResumes, useDefaultMasterResume } from '@/api/masterResume';
 
 interface ApplicationFormProps {
   initialData?: JobApplication;
@@ -14,6 +15,11 @@ interface ApplicationFormProps {
 export function ApplicationForm({ initialData, onSubmit, isSubmitting }: ApplicationFormProps) {
   const navigate = useNavigate();
   const addToast = useUIStore((s) => s.addToast);
+
+  // Fetch master resumes for selection
+  const { data: masterResumes } = useMasterResumes();
+  const { data: defaultResume } = useDefaultMasterResume();
+  const [showMasterResumeSelector, setShowMasterResumeSelector] = useState(false);
 
   const [formData, setFormData] = useState<JobApplicationInput>({
     company_name: initialData?.company_name || '',
@@ -35,7 +41,27 @@ export function ApplicationForm({ initialData, onSubmit, isSubmitting }: Applica
     notes: initialData?.notes || '',
     resume_version: initialData?.resume_version || '',
     cover_letter_sent: initialData?.cover_letter_sent || false,
+    master_resume: initialData?.master_resume || null,
   });
+
+  const handleUseMasterResume = (resumeId: number | null) => {
+    if (resumeId) {
+      setFormData((prev) => ({
+        ...prev,
+        master_resume: resumeId,
+      }));
+      addToast('Master resume linked to this application', 'success');
+      setShowMasterResumeSelector(false);
+    }
+  };
+
+  const handleUseDefaultResume = () => {
+    if (defaultResume) {
+      handleUseMasterResume(defaultResume.id);
+    } else {
+      addToast('No default resume set. Please select a resume or create one.', 'info');
+    }
+  };
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
@@ -290,6 +316,66 @@ export function ApplicationForm({ initialData, onSubmit, isSubmitting }: Applica
       {/* Additional Info */}
       <div className="card">
         <h2 className="text-lg font-semibold mb-4">Additional Information</h2>
+
+        {/* Master Resume Section */}
+        <div className="mb-6 p-4 bg-gray-50 rounded-lg border border-gray-200">
+          <div className="flex items-center justify-between mb-3">
+            <h3 className="text-md font-medium">Master Resume Template</h3>
+            {formData.master_resume && (
+              <span className="text-sm text-green-600 font-medium">✓ Resume Linked</span>
+            )}
+          </div>
+
+          <div className="flex gap-2 mb-3">
+            <button
+              type="button"
+              onClick={handleUseDefaultResume}
+              className="btn btn-secondary text-sm"
+              disabled={!defaultResume}
+            >
+              📄 Use Default Resume
+            </button>
+            <button
+              type="button"
+              onClick={() => setShowMasterResumeSelector(!showMasterResumeSelector)}
+              className="btn btn-secondary text-sm"
+            >
+              📋 {showMasterResumeSelector ? 'Hide' : 'Choose'} Resume
+            </button>
+            <button
+              type="button"
+              onClick={() => navigate('/master-resumes')}
+              className="btn btn-secondary text-sm"
+            >
+              ➕ Manage Resumes
+            </button>
+          </div>
+
+          {showMasterResumeSelector && masterResumes && masterResumes.length > 0 && (
+            <div className="space-y-2 mt-3">
+              <label className="label text-sm">Select a master resume:</label>
+              <select
+                value={formData.master_resume || ''}
+                onChange={(e) => handleUseMasterResume(Number(e.target.value) || null)}
+                className="input text-sm"
+              >
+                <option value="">-- Select Resume --</option>
+                {masterResumes.map((resume) => (
+                  <option key={resume.id} value={resume.id}>
+                    {resume.name} {resume.is_default ? '(Default)' : ''} - {resume.full_name}
+                  </option>
+                ))}
+              </select>
+            </div>
+          )}
+
+          {showMasterResumeSelector && (!masterResumes || masterResumes.length === 0) && (
+            <p className="text-sm text-gray-600 mt-3">
+              No master resumes available. <button type="button" onClick={() => navigate('/master-resumes/create')} className="text-blue-600 underline">Create one now</button>
+            </p>
+          )}
+        </div>
+
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
           <div>
             <label className="label">Resume Version</label>

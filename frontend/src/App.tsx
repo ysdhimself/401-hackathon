@@ -9,6 +9,9 @@ import { ApplicationEdit } from '@/pages/ApplicationEdit';
 import { FollowUpList } from '@/pages/FollowUpList';
 import { GmailPage } from '@/pages/GmailPage';
 import { NotFound } from '@/pages/NotFound';
+import MasterResumeList from '@/pages/MasterResumeList';
+import MasterResumeForm from '@/pages/MasterResumeForm';
+import MasterResumeDetail from '@/pages/MasterResumeDetail';
 
 function App() {
   return (
@@ -22,6 +25,10 @@ function App() {
           <Route path="applications/:id/edit" element={<ApplicationEdit />} />
           <Route path="follow-ups" element={<FollowUpList />} />
           <Route path="gmail" element={<GmailPage />} />
+          <Route path="master-resumes" element={<MasterResumeList />} />
+          <Route path="master-resumes/create" element={<MasterResumeForm />} />
+          <Route path="master-resumes/:id" element={<MasterResumeDetail />} />
+          <Route path="master-resumes/:id/edit" element={<MasterResumeForm />} />
           <Route path="*" element={<NotFound />} />
         </Route>
       </Routes>
