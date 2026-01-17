@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Connected</title>
+    <style>
+      body {
+        margin: 0;
+        font-family: "Georgia", "Times New Roman", serif;
+        background: #f5f2ea;
+        color: #1b1b1b;
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+      .card {
+        text-align: center;
+        background: #ffffff;
+        padding: 40px 32px;
+        border-radius: 16px;
+        box-shadow: 0 18px 40px rgba(0, 0, 0, 0.12);
+        max-width: 420px;
+        width: 90%;
+      }
+      a {
+        display: inline-block;
+        margin-top: 18px;
+        color: #1f6feb;
+        text-decoration: none;
+        font-weight: 600;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="card">
+      <h1>Connected</h1>
+      <p>{{ email }}</p>
+      <p>Fetching your latest emails now...</p>
+      <a href="{{ emails_url }}">View latest email subjects</a>
+    </div>
+
+    <script>
+      async function fetchAndRedirect() {
+        try {
+          await fetch("/api/emails/fetch");
+        } catch (error) {
+          console.error(error);
+        } finally {
+          window.location.href = "{{ emails_url }}";
+        }
+      }
+
+      fetchAndRedirect();
+    </script>
+  </body>
+</html>

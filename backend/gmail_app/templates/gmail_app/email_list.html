@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Recent Emails</title>
+    <style>
+      body {
+        margin: 0;
+        font-family: "Georgia", "Times New Roman", serif;
+        background: #f8f4ee;
+        color: #1b1b1b;
+      }
+      .wrap {
+        max-width: 720px;
+        margin: 48px auto;
+        padding: 0 24px;
+      }
+      h1 {
+        margin-bottom: 24px;
+        font-size: 28px;
+      }
+      ul {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+      }
+      li {
+        background: #ffffff;
+        padding: 16px 20px;
+        border-radius: 12px;
+        box-shadow: 0 8px 18px rgba(0, 0, 0, 0.08);
+        margin-bottom: 12px;
+      }
+      .subject {
+        font-weight: 600;
+      }
+      .meta {
+        font-size: 14px;
+        color: #5a5a5a;
+        margin-top: 6px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="wrap">
+      <h1>Latest Email Subjects</h1>
+      {% if messages %}
+        <ul>
+          {% for message in messages %}
+            <li>
+              <div class="subject">{{ message.subject|default:"(No subject)" }}</div>
+              <div class="meta">{{ message.sender }}</div>
+            </li>
+          {% endfor %}
+        </ul>
+      {% else %}
+        <p>No emails fetched yet. Run the fetch endpoint first.</p>
+      {% endif %}
+    </div>
+  </body>
+</html>
