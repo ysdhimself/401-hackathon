@@ -94,7 +94,7 @@ export function Dashboard() {
                 placeholder="Acme Corp"
               />
             </div>
-            <div>
+            <div className="w-full min-w-0">
               <label className="label">Position *</label>
               <input
                 name="position_title"
@@ -105,7 +105,7 @@ export function Dashboard() {
                 placeholder="Product Manager"
               />
             </div>
-            <div>
+            <div className="w-full min-w-0">
               <label className="label">Status</label>
               <select
                 name="status"
@@ -120,7 +120,7 @@ export function Dashboard() {
                 ))}
               </select>
             </div>
-            <div>
+            <div className="w-full min-w-0">
               <label className="label">Date Applied</label>
               <input
                 type="date"

@@ -182,7 +182,8 @@
   border: 1px solid #e0e6f0;
   border-radius: 10px;
   padding: 0.65rem 0.9rem;
-  min-width: 280px;
+  width: 100%;
+  min-width: 0;
 }
 
 .chip-row {
@@ -426,7 +427,8 @@
   }
 
   .input {
-    min-width: 220px;
+    width: 100%;
+    min-width: 0;
   }
 }
 
@@ -446,5 +448,6 @@
 
   .input {
     width: 100%;
+    min-width: 0;
   }
 }
