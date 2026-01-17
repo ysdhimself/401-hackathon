@@ -1,9 +1,49 @@
 import { useParams, Link } from 'react-router-dom';
 import { useMasterResume } from '@/api/masterResume';
+import { useState, useEffect } from 'react';
 
 export default function MasterResumeDetail() {
     const { id } = useParams();
     const { data: resume, isLoading } = useMasterResume(Number(id));
+    const [pdfError, setPdfError] = useState<string | null>(null);
+    const [pdfLoading, setPdfLoading] = useState(true);
+    const [pdfUrl, setPdfUrl] = useState<string | null>(null);
+
+    useEffect(() => {
+        if (resume) {
+            // Fetch the PDF as a blob and create an object URL
+            const fetchPdf = async () => {
+                try {
+                    setPdfLoading(true);
+                    setPdfError(null);
+
+                    const response = await fetch(`/api/master-resume/resumes/${resume.id}/pdf/`);
+
+                    if (!response.ok) {
+                        throw new Error(`Failed to generate PDF: ${response.statusText}`);
+                    }
+
+                    const blob = await response.blob();
+                    const url = URL.createObjectURL(blob);
+                    setPdfUrl(url);
+                    setPdfLoading(false);
+                } catch (error) {
+                    console.error('PDF fetch error:', error);
+                    setPdfError(error instanceof Error ? error.message : 'Failed to load PDF');
+                    setPdfLoading(false);
+                }
+            };
+
+            fetchPdf();
+
+            // Cleanup object URL on unmount
+            return () => {
+                if (pdfUrl) {
+                    URL.revokeObjectURL(pdfUrl);
+                }
+            };
+        }
+    }, [resume?.id]);
 
     if (isLoading) {
         return (
@@ -26,9 +66,12 @@ export default function MasterResumeDetail() {
         );
     }
 
+    // URL for downloading (with download query param) - can use proxy
+    const pdfDownloadUrl = `/api/master-resume/resumes/${resume.id}/pdf/?download=true`;
+
     return (
-        <div className="container mx-auto py-8 max-w-4xl">
-            <div className="flex justify-between items-center mb-6">
+        <div className="container mx-auto py-4 px-4" style={{ maxWidth: '100%' }}>
+            <div className="flex justify-between items-center mb-4">
                 <div>
                     <h1 className="text-3xl font-bold">{resume.name}</h1>
                     {resume.is_default && (
@@ -39,8 +82,7 @@ export default function MasterResumeDetail() {
                 </div>
                 <div className="flex gap-2">
                     <a
-                        href={`http://localhost:8000/api/master-resume/resumes/${resume.id}/pdf/`}
-                        download
+                        href={pdfDownloadUrl}
                         className="btn btn-primary"
                     >
                         Download PDF
@@ -55,126 +97,51 @@ export default function MasterResumeDetail() {
                         ← Back
                     </Link>
                 </div>
-            </div>            {/* Contact Information */}
-            <div className="card mb-6">
-                <h2 className="text-xl font-semibold mb-4 text-center">{resume.full_name}</h2>
-                <div className="text-center text-gray-600 space-y-1">
-                    <p>{resume.email}</p>
-                    {resume.phone && <p>{resume.phone}</p>}
-                    {resume.location && <p>{resume.location}</p>}
-                    <div className="flex justify-center gap-4 mt-3 flex-wrap">
-                        {resume.linkedin_url && (
-                            <a
-                                href={resume.linkedin_url}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                className="text-blue-600 hover:underline"
-                            >
-                                LinkedIn
-                            </a>
-                        )}
-                        {resume.portfolio_url && (
-                            <a
-                                href={resume.portfolio_url}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                className="text-blue-600 hover:underline"
-                            >
-                                Portfolio
-                            </a>
-                        )}
-                        {resume.github_url && (
-                            <a
-                                href={resume.github_url}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                className="text-blue-600 hover:underline"
-                            >
-                                GitHub
-                            </a>
-                        )}
-                    </div>
-                </div>
             </div>
 
-            {/* Professional Summary */}
-            {resume.summary && (
-                <div className="card mb-6">
-                    <h2 className="text-xl font-semibold mb-3">Professional Summary</h2>
-                    <p className="text-gray-700 whitespace-pre-wrap">{resume.summary}</p>
-                </div>
-            )}
-
-            {/* Sections */}
-            {resume.sections && resume.sections.length > 0 ? (
-                <div className="space-y-6">
-                    {resume.sections.map((section) => (
-                        <div key={section.id} className="card">
-                            <h2 className="text-xl font-semibold mb-4">{section.section_title}</h2>
-
-                            {section.entries && section.entries.length > 0 ? (
-                                <div className="space-y-4">
-                                    {section.entries
-                                        .filter((entry) => entry.is_active)
-                                        .map((entry) => (
-                                            <div key={entry.id} className="border-l-4 border-blue-500 pl-4">
-                                                <div className="flex justify-between items-start mb-1">
-                                                    <h3 className="font-semibold text-lg">{entry.title}</h3>
-                                                    {entry.start_date && (
-                                                        <span className="text-sm text-gray-600">
-                                                            {entry.start_date} - {entry.end_date || 'Present'}
-                                                        </span>
-                                                    )}
-                                                </div>
-                                                {entry.organization && (
-                                                    <p className="text-gray-700 mb-1">
-                                                        <strong>{entry.organization}</strong>
-                                                        {entry.location && ` • ${entry.location}`}
-                                                    </p>
-                                                )}
-                                                {entry.description && (
-                                                    <p className="text-gray-600 whitespace-pre-wrap mb-2">
-                                                        {entry.description}
-                                                    </p>
-                                                )}
-                                                {entry.technologies && (
-                                                    <p className="text-sm text-gray-500">
-                                                        <strong>Technologies:</strong> {entry.technologies}
-                                                    </p>
-                                                )}
-                                                {entry.link && (
-                                                    <a
-                                                        href={entry.link}
-                                                        target="_blank"
-                                                        rel="noopener noreferrer"
-                                                        className="text-blue-600 hover:underline text-sm"
-                                                    >
-                                                        View Project →
-                                                    </a>
-                                                )}
-                                            </div>
-                                        ))}
-                                </div>
-                            ) : (
-                                <p className="text-gray-500 italic">No entries in this section yet.</p>
-                            )}
+            {/* PDF Preview */}
+            <div className="card p-0 overflow-hidden" style={{ height: 'calc(100vh - 140px)' }}>
+                {pdfLoading ? (
+                    <div className="flex flex-col items-center justify-center h-full p-8 text-center">
+                        <div className="animate-spin rounded-full h-16 w-16 border-b-4 border-blue-600 mb-4"></div>
+                        <h3 className="text-xl font-semibold mb-2">Generating PDF...</h3>
+                        <p className="text-gray-600">This may take up to 60 seconds as we compile your resume with LaTeX.</p>
+                    </div>
+                ) : pdfError ? (
+                    <div className="flex flex-col items-center justify-center h-full p-8 text-center">
+                        <div className="text-red-600 mb-4">
+                            <svg className="w-16 h-16 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                            </svg>
+                            <h3 className="text-xl font-semibold mb-2">Failed to Load PDF Preview</h3>
+                            <p className="text-gray-600 mb-4">{pdfError}</p>
                         </div>
-                    ))}
-                </div>
-            ) : (
-                <div className="card text-center py-12">
-                    <h3 className="text-lg font-semibold mb-2">No Sections Yet</h3>
-                    <p className="text-gray-600 mb-4">
-                        Add sections like Experience, Education, Skills, etc. to build your resume.
-                    </p>
-                    <Link
-                        to={`/master-resumes/${resume.id}/edit`}
-                        className="btn btn-primary"
-                    >
-                        Add Sections
-                    </Link>
-                </div>
-            )}
+                        <div className="flex gap-4">
+                            <a
+                                href={pdfDownloadUrl}
+                                className="btn btn-primary"
+                            >
+                                Try Download Instead
+                            </a>
+                            <button
+                                onClick={() => {
+                                    setPdfError(null);
+                                    window.location.reload();
+                                }}
+                                className="btn btn-secondary"
+                            >
+                                Retry
+                            </button>
+                        </div>
+                    </div>
+                ) : pdfUrl ? (
+                    <iframe
+                        src={pdfUrl}
+                        className="w-full h-full border-0"
+                        title="Resume PDF Preview"
+                    />
+                ) : null}
+            </div>
         </div>
     );
 }
