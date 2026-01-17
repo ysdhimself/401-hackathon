@@ -38,7 +38,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'gmail_app',
+    'applications',
 ]
 
 MIDDLEWARE = [
@@ -123,15 +123,14 @@ STATIC_URL = 'static/'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-# OAuth settings (set these in your environment for local dev)
-GOOGLE_CLIENT_ID = os.environ.get('GOOGLE_CLIENT_ID', '')
-GOOGLE_CLIENT_SECRET = os.environ.get('GOOGLE_CLIENT_SECRET', '')
-GOOGLE_REDIRECT_URI = os.environ.get(
-    'GOOGLE_REDIRECT_URI',
-    'http://localhost:8000/api/auth/google/callback',
-)
-GMAIL_OAUTH_SCOPES = [
-    'https://www.googleapis.com/auth/gmail.readonly',
-    'https://www.googleapis.com/auth/userinfo.email',
-    'openid',
-]
+# Email settings (use console backend for development)
+EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+DEFAULT_FROM_EMAIL = 'noreply@jobfinder.local'
+
+# For production, configure SMTP:
+# EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+# EMAIL_HOST = 'smtp.example.com'
+# EMAIL_PORT = 587
+# EMAIL_USE_TLS = True
+# EMAIL_HOST_USER = 'your-email@example.com'
+# EMAIL_HOST_PASSWORD = 'your-password'

@@ -1,40 +1,43 @@
-Job Application Analyzer Project placeholder
+# Job Finder
 
-## Backend OAuth + Gmail MVP
+A Django 5.2 web application for job searching functionality.
 
-Setup
-1) Create a virtual environment and install dependencies (Django).
-2) Source env vars:
+## Setup
+
+1. Navigate to the backend directory:
    ```bash
-   cp setup.sh.example setup.sh
-   # edit setup.sh with your real values
-   source setup.sh
-   ```
-3) Run migrations:
-   ```bash
-   cd backend
-   python3 manage.py makemigrations
-   python3 manage.py migrate
-   ```
-4) Start server:
-   ```bash
-   python3 manage.py runserver
+   cd backend/
    ```
 
-Run
-- Open `http://localhost:8000/api/`
-- Click "Sign in with Gmail"
-- After consent, the app auto-fetches emails and redirects to the list page
-- [optional] Visit `http://localhost:8000/api/emails/page` to view up to 5 latest subjects if not directly automatically
+2. Run database migrations:
+   ```bash
+   python manage.py migrate
+   ```
 
-Env vars
-- GOOGLE_CLIENT_ID
-- GOOGLE_CLIENT_SECRET
-- GOOGLE_REDIRECT_URI (default: http://localhost:8000/api/auth/google/callback)
+3. Start the development server:
+   ```bash
+   python manage.py runserver
+   ```
 
-<!-- Endpoints
-- GET /api/
-- GET /api/auth/google/login
-- GET /api/auth/google/callback
-- GET /api/emails/fetch
-- GET /api/emails/page -->
+## Commands
+
+```bash
+# Database operations
+python manage.py migrate
+python manage.py makemigrations
+
+# Create admin user
+python manage.py createsuperuser
+
+# Run tests
+python manage.py test
+
+# Django shell
+python manage.py shell
+```
+
+## Architecture
+
+- **Framework**: Django 5.2.8 (MVT pattern)
+- **Database**: SQLite3 (development)
+- **Server**: WSGI/ASGI compatible
