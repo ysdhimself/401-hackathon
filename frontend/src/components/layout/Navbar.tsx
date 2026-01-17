@@ -22,6 +22,7 @@ export function Navbar() {
             </span>
           )}
         </NavItem>
+        <NavItem to="/master-resumes">Master Resume</NavItem>
         <NavItem to="/applications/new">+ New Application</NavItem>
         <NavItem to="/gmail">Gmail</NavItem>
       </ul>
@@ -35,8 +36,7 @@ function NavItem({ to, children }: { to: string; children: ReactNode }) {
       <NavLink
         to={to}
         className={({ isActive }) =>
-          `text-gray-300 hover:text-white px-3 py-2 rounded transition-colors inline-flex items-center ${
-            isActive ? 'bg-slate-700 text-white' : ''
+          `text-gray-300 hover:text-white px-3 py-2 rounded transition-colors inline-flex items-center ${isActive ? 'bg-slate-700 text-white' : ''
           }`
         }
       >

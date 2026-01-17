@@ -23,7 +23,7 @@ class JobApplicationListSerializer(serializers.ModelSerializer):
             'id', 'company_name', 'position_title', 'status', 'status_display',
             'date_applied', 'job_type', 'job_type_display', 'location',
             'work_location_type', 'work_location_type_display',
-            'follow_up_date', 'needs_follow_up', 'is_overdue'
+            'follow_up_date', 'needs_follow_up', 'is_overdue', 'master_resume'
         ]
 
 
