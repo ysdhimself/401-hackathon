@@ -135,5 +135,3 @@ GMAIL_OAUTH_SCOPES = [
     'https://www.googleapis.com/auth/userinfo.email',
     'openid',
 ]
-
-from . import firebase
