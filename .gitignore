@@ -1,6 +1,17 @@
 venv/
 db.sqlite3
+.env
+
 .*
 !.gitignore
 *.md
 !README.md
+
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+
+*.log
+build/
