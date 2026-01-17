@@ -37,6 +37,7 @@ export interface JobApplicationListItem {
   follow_up_date: string | null;
   needs_follow_up: boolean;
   is_overdue: boolean;
+  master_resume: number | null;
 }
 
 export interface JobApplication extends JobApplicationListItem {
@@ -77,6 +78,74 @@ export interface JobApplicationInput {
   notes?: string;
   resume_version?: string;
   cover_letter_sent?: boolean;
+  master_resume?: number | null;
+}
+
+// Master Resume types
+export type SectionType = 'experience' | 'education' | 'skills' | 'projects' | 'certifications' | 'awards' | 'custom';
+
+export interface ResumeEntry {
+  id: number;
+  title: string;
+  organization: string;
+  location: string;
+  start_date: string;
+  end_date: string;
+  description: string;
+  link: string;
+  technologies: string;
+  order: number;
+  is_active: boolean;
+}
+
+export interface ResumeSection {
+  id: number;
+  section_type: SectionType;
+  section_type_display: string;
+  section_title: string;
+  order: number;
+  entries: ResumeEntry[];
+}
+
+export interface MasterResume {
+  id: number;
+  name: string;
+  is_default: boolean;
+  full_name: string;
+  email: string;
+  phone: string;
+  location: string;
+  linkedin_url: string;
+  portfolio_url: string;
+  github_url: string;
+  summary: string;
+  sections: ResumeSection[];
+  created_at: string;
+  updated_at: string;
+}
+
+export interface MasterResumeListItem {
+  id: number;
+  name: string;
+  full_name: string;
+  email: string;
+  is_default: boolean;
+  created_at: string;
+  updated_at: string;
+  section_count: number;
+}
+
+export interface MasterResumeInput {
+  name: string;
+  is_default?: boolean;
+  full_name: string;
+  email: string;
+  phone?: string;
+  location?: string;
+  linkedin_url?: string;
+  portfolio_url?: string;
+  github_url?: string;
+  summary?: string;
 }
 
 export interface DashboardStats {

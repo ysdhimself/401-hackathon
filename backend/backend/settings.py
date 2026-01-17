@@ -50,6 +50,7 @@ INSTALLED_APPS = [
     # Local apps
     'applications',
     'gmail_app',
+    'masterResume',
 ]
 
 MIDDLEWARE = [

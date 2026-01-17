@@ -64,6 +64,16 @@ class JobApplication(models.Model):
     notes = models.TextField(blank=True)
     resume_version = models.CharField(max_length=100, blank=True)
     cover_letter_sent = models.BooleanField(default=False)
+    
+    # Link to master resume (for tailored resumes)
+    master_resume = models.ForeignKey(
+        'masterResume.MasterResume',
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name='applications',
+        help_text="Master resume this application's resume was based on"
+    )
 
     # Timestamps
     created_at = models.DateTimeField(auto_now_add=True)

@@ -25,4 +25,5 @@ urlpatterns = [
     # REST API endpoints for React frontend
     path('api/', include('applications.api_urls')),
     path('api/gmail/', include('gmail_app.api_urls')),
+    path('api/master-resume/', include('masterResume.api_urls')),
 ]
