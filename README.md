@@ -1,36 +1,25 @@
-Job Application Analyzer Project placeholder
+# Job Finder
 
 ## Backend OAuth + Gmail MVP
+Django REST backend with a React (Vite + Tailwind) frontend for tracking job applications, follow-ups, and Gmail-powered email ingestion.
 
-Setup
-1) Create a virtual environment and install dependencies (Django).
-2) Source env vars:
-   ```bash
-   cp setup.sh.example setup.sh
-   # edit setup.sh with your real values
-   source setup.sh
-   ```
-3) Run migrations:
-   ```bash
-   cd backend
-   python3 manage.py makemigrations
-   python3 manage.py migrate
-   ```
-4) Start server:
-   ```bash
-   python3 manage.py runserver
-   ```
+## Prerequisites
+- Python 3.11+ (recommended: `python -m venv .venv`)
+- Node 18+ / npm
 
-Run
-- Open `http://localhost:8000/api/`
-- Click "Sign in with Gmail"
-- After consent, the app auto-fetches emails and redirects to the list page
-- [optional] Visit `http://localhost:8000/api/emails/page` to view up to 5 latest subjects if not directly automatically
+## Backend (API)
+```bash
+cd backend
+cp .env.example .env  # fill Gmail OAuth values if you want email import
+pip install -r requirements.txt
+python manage.py migrate
+python manage.py runserver  # http://localhost:8000
+```
 
-Env vars
-- GOOGLE_CLIENT_ID
-- GOOGLE_CLIENT_SECRET
-- GOOGLE_REDIRECT_URI (default: http://localhost:8000/api/auth/google/callback)
+Helpful commands:
+- `python manage.py createsuperuser`
+- `python manage.py makemigrations` / `python manage.py migrate`
+- `python manage.py test`
 
 <!-- Endpoints
 - GET /api/
@@ -43,3 +32,22 @@ Env vars
 
 ## Adding the firebase JSON FIle
 1) in the secrets folder place the firebase.json inside there.
+## Frontend (React)
+```bash
+cd frontend
+npm install
+npm run dev       # http://localhost:5173 (proxies /api to 8000)
+# or
+npm run build && npm run preview
+```
+
+Highlights:
+- React Router + React Query + Tailwind UI
+- Dashboard with quick-add application form, stats, recent items, and follow-up list
+- Full CRUD for applications, notes, and filters
+- Gmail page to connect/fetch/disconnect (requires backend Gmail env vars)
+
+## Notes
+- API is under `/api/**` (Vite dev server proxies to `localhost:8000`).
+- CORS is configured for `http://localhost:5173`.
+- SQLite is used for development; adjust `DATABASES` in `backend/backend/settings.py` for other databases.***

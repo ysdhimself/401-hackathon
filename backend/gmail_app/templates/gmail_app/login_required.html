@@ -1,43 +1,18 @@
-<!DOCTYPE html>
-<html lang="en">
-  <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Login Required</title>
-    <style>
-      body {
-        margin: 0;
-        font-family: "Georgia", "Times New Roman", serif;
-        background: #f5f2ea;
-        color: #1b1b1b;
-        min-height: 100vh;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-      }
-      .card {
-        text-align: center;
-        background: #ffffff;
-        padding: 40px 32px;
-        border-radius: 16px;
-        box-shadow: 0 18px 40px rgba(0, 0, 0, 0.12);
-        max-width: 420px;
-        width: 90%;
-      }
-      a {
-        display: inline-block;
-        margin-top: 18px;
-        color: #1f6feb;
-        text-decoration: none;
-        font-weight: 600;
-      }
-    </style>
-  </head>
-  <body>
-    <div class="card">
-      <h1>Login Required</h1>
-      <p>Please sign in with Gmail first.</p>
-      <a href="/api/">Go to login</a>
-    </div>
-  </body>
-</html>
+{% extends 'base.html' %}
+
+{% block title %}Login Required - Job Tracker{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1 class="page-title">Gmail Login Required</h1>
+</div>
+
+<div class="card" style="max-width: 500px; margin: 0 auto; text-align: center;">
+    <div style="font-size: 3rem; margin-bottom: 1rem; color: #e74c3c;">!</div>
+    <h2 style="margin-bottom: 1rem;">Authentication Required</h2>
+    <p style="color: #7f8c8d; margin-bottom: 1.5rem;">
+        Please sign in with Gmail to view your emails.
+    </p>
+    <a href="{% url 'gmail:login-page' %}" class="btn btn-primary">Connect Gmail</a>
+</div>
+{% endblock %}

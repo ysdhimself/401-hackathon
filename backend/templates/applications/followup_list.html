@@ -1,0 +1,59 @@
+{% extends 'base.html' %}
+
+{% block title %}Follow-ups - Job Application Tracker{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1 class="page-title">Pending Follow-ups</h1>
+    <a href="{% url 'applications:application_list' %}" class="btn btn-secondary">View All Applications</a>
+</div>
+
+<div class="card">
+    {% if applications %}
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Company</th>
+                <th>Position</th>
+                <th>Status</th>
+                <th>Follow-up Date</th>
+                <th>Days Until</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for app in applications %}
+            <tr class="{% if app.is_overdue %}overdue{% endif %}">
+                <td>
+                    <a href="{% url 'applications:application_detail' app.pk %}">{{ app.company_name }}</a>
+                </td>
+                <td>{{ app.position_title }}</td>
+                <td><span class="status-badge status-{{ app.status }}">{{ app.get_status_display }}</span></td>
+                <td class="{% if app.is_overdue %}text-danger{% endif %}">
+                    {{ app.follow_up_date|date:"M d, Y" }}
+                </td>
+                <td>
+                    {% if app.is_overdue %}
+                        <span class="text-danger" style="font-weight: bold;">OVERDUE</span>
+                    {% else %}
+                        {% widthratio app.follow_up_date|timeuntil:"," 1 1 as days_str %}
+                        {{ app.follow_up_date|timeuntil }}
+                    {% endif %}
+                </td>
+                <td>
+                    <a href="{% url 'applications:application_detail' app.pk %}" class="btn btn-sm btn-primary">View</a>
+                    <a href="{% url 'applications:application_update' app.pk %}" class="btn btn-sm btn-secondary">Edit</a>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+    <div style="padding: 3rem; text-align: center;">
+        <p class="text-muted" style="font-size: 1.25rem; margin-bottom: 1rem;">No pending follow-ups!</p>
+        <p class="text-muted">All caught up. Add follow-up dates to your applications to see them here.</p>
+        <a href="{% url 'applications:application_list' %}" class="btn btn-primary mt-2">View Applications</a>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}
