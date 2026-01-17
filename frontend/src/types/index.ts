@@ -28,6 +28,7 @@ export interface JobApplicationListItem {
   status: ApplicationStatus;
   status_display: string;
   date_applied: string;
+  job_description: string;
   job_type: JobType;
   job_type_display: string;
   location: string;
