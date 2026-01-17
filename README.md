@@ -38,3 +38,6 @@ Env vars
 - GET /api/auth/google/callback
 - GET /api/emails/fetch
 - GET /api/emails/page -->
+
+Adding the firebase JSON FIle
+1) in the secrets folder place the JSON inside there. 
