@@ -231,7 +231,7 @@ export interface Toast {
 // Status display configuration
 export const STATUS_OPTIONS: { value: ApplicationStatus; label: string }[] = [
   { value: 'applied', label: 'Applied' },
-  { value: 'phone_screen', label: 'Phone Screen' },
+  { value: 'phone_screen', label: 'Screening' },
   { value: 'interview', label: 'Interview' },
   { value: 'technical', label: 'Technical Interview' },
   { value: 'onsite', label: 'On-site Interview' },

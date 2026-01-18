@@ -6,7 +6,7 @@ from datetime import date, timedelta
 class JobApplication(models.Model):
     STATUS_CHOICES = [
         ('applied', 'Applied'),
-        ('phone_screen', 'Phone Screen'),
+        ('phone_screen', 'Screening'),
         ('interview', 'Interview'),
         ('technical', 'Technical Interview'),
         ('onsite', 'On-site Interview'),
