@@ -1,6 +1,7 @@
 from rest_framework import viewsets, status
 from rest_framework.decorators import action
 from rest_framework.response import Response
+from rest_framework.parsers import MultiPartParser, FormParser
 from django.http import HttpResponse
 import requests
 from urllib.parse import quote
@@ -16,6 +17,8 @@ from .serializers import (
     ResumeEntryCreateSerializer,
 )
 from .latex_generator import generate_latex_resume
+from .html_generator import generate_html_resume
+from .parser import parse_resume_file
 
 
 class MasterResumeViewSet(viewsets.ModelViewSet):
@@ -37,6 +40,27 @@ class MasterResumeViewSet(viewsets.ModelViewSet):
             )
         serializer = MasterResumeDetailSerializer(default_resume)
         return Response(serializer.data)
+
+    @action(detail=False, methods=['post'], parser_classes=[MultiPartParser, FormParser])
+    def parse(self, request):
+        """Parse an uploaded resume and return extracted fields."""
+        uploaded_file = request.FILES.get('file')
+        if not uploaded_file:
+            return Response(
+                {'detail': 'No file uploaded. Please attach a file.'},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        try:
+            parsed = parse_resume_file(uploaded_file)
+            return Response(parsed)
+        except ValueError as exc:
+            return Response({'detail': str(exc)}, status=status.HTTP_400_BAD_REQUEST)
+        except Exception as exc:
+            return Response(
+                {'detail': f'Failed to parse resume: {str(exc)}'},
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
     
     @action(detail=True, methods=['post'])
     def duplicate(self, request, pk=None):
@@ -96,17 +120,44 @@ class MasterResumeViewSet(viewsets.ModelViewSet):
         return response
     
     @action(detail=True, methods=['get'])
-    def pdf(self, request, pk=None):
-        """Generate and download PDF resume using LaTeX.Online API."""
+    def html(self, request, pk=None):
+        """Generate HTML preview of this resume."""
         resume = self.get_object()
-        latex_code = generate_latex_resume(resume)
+        html_code = generate_html_resume(resume)
         
+        return HttpResponse(html_code, content_type='text/html')
+    
+    @action(detail=True, methods=['get'])
+    def pdf(self, request, pk=None):
+        """Generate and download PDF resume. Try LaTeX first, fallback to HTML."""
+        resume = self.get_object()
+        
+        # Debug mode: return raw LaTeX/HTML instead of PDF
+        if request.query_params.get('debug') == 'true':
+            latex_code = generate_latex_resume(resume)
+            html_code = generate_html_resume(resume)
+            return Response({'latex': latex_code, 'html': html_code})
+        
+        # Try LaTeX first (better quality but prone to errors with special chars)
         try:
-            # Use LaTeX.Online API with text parameter
-            # URL encode the LaTeX content
-            encoded_latex = quote(latex_code)
-            api_url = f'https://latexonline.cc/compile?text={encoded_latex}'
+            latex_code = generate_latex_resume(resume)
             
+            # LaTeX.Online only supports GET for raw text; for long resumes,
+            # upload to a paste service and compile via the URL.
+            if len(latex_code) > 2000:
+                paste_response = requests.post(
+                    'https://paste.rs',
+                    data=latex_code.encode('utf-8'),
+                    timeout=30
+                )
+                if paste_response.status_code not in (200, 201):
+                    raise Exception('Failed to upload LaTeX to paste service')
+                latex_url = paste_response.text.strip()
+                api_url = f'https://latexonline.cc/compile?url={quote(latex_url)}'
+            else:
+                encoded_latex = quote(latex_code)
+                api_url = f'https://latexonline.cc/compile?text={encoded_latex}'
+
             response = requests.get(api_url, timeout=60)
             
             # Check if compilation succeeded
@@ -124,30 +175,44 @@ class MasterResumeViewSet(viewsets.ModelViewSet):
                 
                 return http_response
             else:
+                # LaTeX failed, try HTML fallback
+                raise Exception(f'LaTeX compilation failed: {response.text[:200]}')
+        
+        except Exception as latex_error:
+            # Fallback to HTML + xhtml2pdf (more forgiving, Windows-compatible)
+            try:
+                from xhtml2pdf import pisa
+                import io
+                
+                html_code = generate_html_resume(resume)
+                pdf_buffer = io.BytesIO()
+                
+                # Convert HTML to PDF
+                pisa_status = pisa.CreatePDF(html_code, dest=pdf_buffer)
+                
+                if pisa_status.err:
+                    raise Exception('HTML to PDF conversion failed')
+                
+                pdf_content = pdf_buffer.getvalue()
+                
+                http_response = HttpResponse(pdf_content, content_type='application/pdf')
+                
+                if request.query_params.get('download') == 'true':
+                    http_response['Content-Disposition'] = f'attachment; filename="{resume.name.replace(" ", "_")}.pdf"'
+                else:
+                    http_response['Content-Disposition'] = f'inline; filename="{resume.name.replace(" ", "_")}.pdf"'
+                
+                return http_response
+            
+            except Exception as html_error:
                 return Response(
                     {
                         'error': 'PDF generation failed',
-                        'details': response.text[:500] if response.text else 'Unknown error',
-                        'status_code': response.status_code
+                        'latex_error': str(latex_error)[:200],
+                        'html_error': str(html_error)[:200]
                     },
                     status=status.HTTP_500_INTERNAL_SERVER_ERROR
                 )
-        
-        except requests.Timeout:
-            return Response(
-                {'error': 'PDF generation timed out'},
-                status=status.HTTP_500_INTERNAL_SERVER_ERROR
-            )
-        except requests.RequestException as e:
-            return Response(
-                {'error': f'PDF generation failed: {str(e)}'},
-                status=status.HTTP_500_INTERNAL_SERVER_ERROR
-            )
-        except Exception as e:
-            return Response(
-                {'error': f'Unexpected error: {str(e)}'},
-                status=status.HTTP_500_INTERNAL_SERVER_ERROR
-            )
 
 
 class ResumeSectionViewSet(viewsets.ModelViewSet):

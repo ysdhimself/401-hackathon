@@ -6,6 +6,7 @@ import type {
     MasterResumeInput,
     ResumeSection,
     ResumeEntry,
+    ParsedResume,
 } from '@/types';
 
 // Query keys for cache management
@@ -116,6 +117,24 @@ export function useDuplicateMasterResume() {
         },
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: MASTER_RESUME_QUERY_KEYS.resumes });
+        },
+    });
+}
+
+// Parse resume upload
+export function useParseMasterResume() {
+    return useMutation({
+        mutationFn: async (file: File) => {
+            const formData = new FormData();
+            formData.append('file', file);
+            const { data } = await apiClient.post<ParsedResume>(
+                '/master-resume/resumes/parse/',
+                formData,
+                {
+                    headers: { 'Content-Type': 'multipart/form-data' },
+                }
+            );
+            return data;
         },
     });
 }
