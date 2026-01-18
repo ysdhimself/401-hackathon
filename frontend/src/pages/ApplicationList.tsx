@@ -1,4 +1,5 @@
 import { Link } from 'react-router-dom';
+import { useState } from 'react';
 import { clsx } from 'clsx';
 import { useApplications } from '@/api/applications';
 import { useUIStore } from '@/stores/uiStore';
@@ -10,6 +11,11 @@ export function ApplicationList() {
   const { filters, setFilters, resetFilters } = useUIStore();
   const { data, isLoading } = useApplications(filters);
   const statusFilters = [{ value: '', label: 'All' }, ...STATUS_OPTIONS];
+  const [expandedDescriptions, setExpandedDescriptions] = useState<Record<number, boolean>>({});
+
+  const toggleDescription = (id: number) => {
+    setExpandedDescriptions((prev) => ({ ...prev, [id]: !prev[id] }));
+  };
 
   return (
     <div>
@@ -91,9 +97,23 @@ export function ApplicationList() {
                       {app.location ? ` • ${app.location}` : ''}
                     </div>
                     {app.job_description && (
-                      <p className="text-sm text-gray-500 mt-1 whitespace-pre-wrap">
+                      <div
+                        className={clsx(
+                          'text-sm text-gray-500 mt-1 whitespace-pre-wrap',
+                          !expandedDescriptions[app.id] && 'clamp-3'
+                        )}
+                      >
                         {app.job_description}
-                      </p>
+                        {app.job_description.length > 300 && (
+                          <button
+                            type="button"
+                            onClick={() => toggleDescription(app.id)}
+                            className="ml-2 text-blue-600 hover:underline"
+                          >
+                            {expandedDescriptions[app.id] ? 'Show less' : '...more'}
+                          </button>
+                        )}
+                      </div>
                     )}
                   </div>
                   <div className="text-sm text-gray-600 md:text-right min-w-[160px]">
@@ -115,7 +135,7 @@ export function ApplicationList() {
             </div>
           )}
 
-          {data?.count && data.count > 20 && (
+          {data?.count !== undefined && data.count > 20 && (
             <div className="mt-4 pt-4 border-t flex justify-between items-center">
               <div className="text-sm text-gray-600">
                 Showing {data.results.length} of {data.count} applications

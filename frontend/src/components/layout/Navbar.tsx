@@ -7,7 +7,7 @@ export function Navbar() {
   const followUpCount = followUps?.length || 0;
 
   return (
-    <nav className="bg-slate-800 px-4 md:px-8 py-4 flex flex-col md:flex-row md:justify-between md:items-center gap-3">
+    <nav className="bg-[#48638E] px-4 md:px-8 py-4 flex flex-col md:flex-row md:justify-between md:items-center gap-3">
       <Link to="/" className="text-white text-xl font-bold">
         Job Tracker
       </Link>
