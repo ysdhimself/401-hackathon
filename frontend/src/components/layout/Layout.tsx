@@ -31,7 +31,7 @@ export function Layout() {
   const finalEmojis = jobEmojis.slice(0, 80);
   
   return (
-    <div className="min-h-screen bg-gray-100 relative overflow-hidden">
+    <div className="min-h-screen bg-[#E5F5F7] relative overflow-hidden">
       <div className="fixed inset-0 pointer-events-none z-0">
         {finalEmojis.map((emoji, index) => (
           <div
