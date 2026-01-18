@@ -115,7 +115,7 @@ export function ApplicationList() {
             </div>
           )}
 
-          {data?.count && data.count > 20 && (
+          {data?.count !== undefined && data.count > 20 && (
             <div className="mt-4 pt-4 border-t flex justify-between items-center">
               <div className="text-sm text-gray-600">
                 Showing {data.results.length} of {data.count} applications
