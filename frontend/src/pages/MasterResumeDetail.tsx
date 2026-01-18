@@ -100,7 +100,7 @@ export default function MasterResumeDetail() {
             </div>
 
             {/* PDF Preview */}
-            <div className="card p-0 overflow-hidden" style={{ height: 'calc(100vh - 140px)' }}>
+            <div className="card p-0 overflow-hidden" style={{ height: 'calc(100vh - 10px)' }}>
                 {pdfLoading ? (
                     <div className="flex flex-col items-center justify-center h-full p-8 text-center">
                         <div className="animate-spin rounded-full h-16 w-16 border-b-4 border-blue-600 mb-4"></div>
