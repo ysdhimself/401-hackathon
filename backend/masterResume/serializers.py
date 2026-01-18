@@ -48,7 +48,7 @@ class MasterResumeDetailSerializer(serializers.ModelSerializer):
         fields = [
             'id', 'name', 'is_default', 'full_name', 'email', 'phone', 
             'location', 'linkedin_url', 'portfolio_url', 'github_url', 
-            'summary', 'sections', 'created_at', 'updated_at'
+            'summary', 'base_font_size', 'sections', 'created_at', 'updated_at'
         ]
         read_only_fields = ['created_at', 'updated_at']
 

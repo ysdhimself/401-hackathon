@@ -119,6 +119,7 @@ export interface MasterResume {
   portfolio_url: string;
   github_url: string;
   summary: string;
+  base_font_size: number;
   sections: ResumeSection[];
   created_at: string;
   updated_at: string;
@@ -146,6 +147,31 @@ export interface MasterResumeInput {
   portfolio_url?: string;
   github_url?: string;
   summary?: string;
+  base_font_size?: number;
+}
+
+export interface ParsedResumeSectionEntry {
+  title: string;
+  organization: string;
+  location: string;
+  start_date: string;
+  end_date: string;
+  description: string;
+  technologies: string;
+  order: number;
+}
+
+export interface ParsedResumeSection {
+  section_type: SectionType;
+  section_title: string;
+  entries: ParsedResumeSectionEntry[];
+}
+
+export interface ParsedResume {
+  resume: Partial<MasterResumeInput> & { name?: string };
+  sections: ParsedResumeSection[];
+  warnings: string[];
+  base_font_size: number;
 }
 
 export interface DashboardStats {

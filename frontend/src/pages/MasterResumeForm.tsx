@@ -1,9 +1,10 @@
-import { useState, useEffect, type FormEvent, type ChangeEvent } from 'react';
+import { useState, useEffect, useLayoutEffect, useRef, type FormEvent, type ChangeEvent } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import {
     useMasterResume,
     useCreateMasterResume,
-    useUpdateMasterResume
+    useUpdateMasterResume,
+    useParseMasterResume
 } from '@/api/masterResume';
 import { useUIStore } from '@/stores/uiStore';
 import type { MasterResumeInput, ResumeSection, ResumeEntry } from '@/types';
@@ -39,6 +40,7 @@ export default function MasterResumeForm() {
     const { data: existingResume, isLoading } = useMasterResume(Number(id));
     const createMutation = useCreateMasterResume();
     const updateMutation = useUpdateMasterResume(Number(id));
+    const parseMutation = useParseMasterResume();
 
     const [formData, setFormData] = useState<MasterResumeInput>({
         name: '',
@@ -53,12 +55,24 @@ export default function MasterResumeForm() {
         summary: '',
     });
 
-    const [sections, setSections] = useState<FormSection[]>([
+    const createDefaultSections = (): FormSection[] => ([
         { section_type: 'education', section_title: 'Education', order: 0, entries: [] },
         { section_type: 'experience', section_title: 'Experience', order: 1, entries: [] },
         { section_type: 'projects', section_title: 'Projects', order: 2, entries: [] },
         { section_type: 'skills', section_title: 'Technical Skills', order: 3, entries: [] },
     ]);
+
+    const [sections, setSections] = useState<FormSection[]>(createDefaultSections());
+
+    const A4_WIDTH_PX = 794;
+    const A4_HEIGHT_PX = 1123;
+    const PAGE_PADDING_X = 32;
+    const PAGE_PADDING_Y = 29;
+    const PAGE_CONTENT_HEIGHT = A4_HEIGHT_PX - PAGE_PADDING_Y * 2;
+    const [pageCount, setPageCount] = useState(1);
+    const [previewScale, setPreviewScale] = useState(1);
+    const contentRef = useRef<HTMLDivElement | null>(null);
+    const previewContainerRef = useRef<HTMLDivElement | null>(null);
 
     useEffect(() => {
         if (existingResume) {
@@ -98,6 +112,220 @@ export default function MasterResumeForm() {
             }
         }
     }, [existingResume]);
+
+    useLayoutEffect(() => {
+        if (!contentRef.current) return;
+        const contentHeight = contentRef.current.scrollHeight;
+        const nextCount = Math.max(1, Math.ceil(contentHeight / PAGE_CONTENT_HEIGHT));
+        if (nextCount !== pageCount) {
+            setPageCount(nextCount);
+        }
+    }, [formData, sections, PAGE_CONTENT_HEIGHT, pageCount]);
+
+    useLayoutEffect(() => {
+        if (!previewContainerRef.current) return;
+        const element = previewContainerRef.current;
+
+        const updateScale = () => {
+            const styles = window.getComputedStyle(element);
+            const paddingLeft = Number.parseFloat(styles.paddingLeft || '0');
+            const paddingRight = Number.parseFloat(styles.paddingRight || '0');
+            const paddingTop = Number.parseFloat(styles.paddingTop || '0');
+            const paddingBottom = Number.parseFloat(styles.paddingBottom || '0');
+            const availableWidth = element.clientWidth - paddingLeft - paddingRight;
+            const availableHeight = element.clientHeight - paddingTop - paddingBottom;
+            if (!availableWidth || !availableHeight) return;
+            const widthScale = availableWidth / A4_WIDTH_PX;
+            const heightScale = availableHeight / A4_HEIGHT_PX;
+            const nextScale = Math.min(1, widthScale, heightScale);
+            setPreviewScale((prev) => (Math.abs(prev - nextScale) > 0.01 ? nextScale : prev));
+        };
+
+        updateScale();
+        const observer = new ResizeObserver(updateScale);
+        observer.observe(element);
+        return () => observer.disconnect();
+    }, [A4_WIDTH_PX]);
+
+    const ResumePreviewContent = () => (
+        <div style={{
+            fontFamily: 'Computer Modern, Latin Modern Roman, serif',
+            fontSize: '6.6pt',
+            lineHeight: '1.2'
+        }}>
+            {/* Header */}
+            <div className="text-center pb-1 mb-2" style={{ borderBottom: '0.9pt solid #000' }}>
+                <h1 className="font-bold uppercase tracking-wider" style={{ fontSize: '12pt', marginBottom: '1pt' }}>
+                    {formData.full_name || 'Your Name'}
+                </h1>
+                <div className="flex flex-wrap justify-center gap-0.5" style={{ fontSize: '6pt', marginTop: '1pt' }}>
+                    {formData.phone && <span>{formData.phone}</span>}
+                    {formData.phone && formData.email && <span className="mx-1">•</span>}
+                    {formData.email && <span style={{ textDecoration: 'underline' }}>{formData.email}</span>}
+                    {(formData.phone || formData.email) && formData.linkedin_url && <span className="mx-1">•</span>}
+                    {formData.linkedin_url && <span style={{ textDecoration: 'underline', color: '#0000EE' }}>linkedin.com/in/...</span>}
+                    {formData.linkedin_url && formData.github_url && <span className="mx-1">•</span>}
+                    {formData.github_url && <span style={{ textDecoration: 'underline', color: '#0000EE' }}>github.com/...</span>}
+                </div>
+            </div>
+
+            {/* Education */}
+            {sections[0].entries.length > 0 && (
+                <div className="mb-1.5">
+                    <h2 className="font-bold uppercase mb-0.5" style={{ fontSize: '14px', borderBottom: '0.5pt solid #000' }}>Education</h2>
+                    {sections[0].entries.map((entry, idx) => (
+                        <div key={idx} className="mb-1" style={{ fontSize: '5pt' }}>
+                            <div className="flex justify-between items-start">
+                                <div className="flex-1">
+                                    <span className="font-bold">{entry.organization || 'Institution Name'}</span>
+                                    {entry.location && <span className="italic ml-2">{entry.location}</span>}
+                                </div>
+                                <span className="italic whitespace-nowrap ml-2">
+                                    {entry.start_date && entry.end_date ? `${entry.start_date} -- ${entry.end_date}` :
+                                        entry.start_date || entry.end_date || 'Dates'}
+                                </span>
+                            </div>
+                            {entry.title && (
+                                <div className="italic">{entry.title}</div>
+                            )}
+                            {entry.description && (
+                                <div className="mt-1 whitespace-pre-line" style={{ fontSize: '12px', lineHeight: '1.15' }}>
+                                    {entry.description}
+                                </div>
+                            )}
+                        </div>
+                    ))}
+                </div>
+            )}
+
+            {/* Experience */}
+            {sections[1].entries.length > 0 && (
+                <div className="mb-1.5">
+                    <h2 className="font-bold uppercase mb-0.5" style={{ fontSize: '14px', borderBottom: '0.5pt solid #000' }}>Experience</h2>
+                    {sections[1].entries.map((entry, idx) => (
+                        <div key={idx} className="mb-1" style={{ fontSize: '5pt' }}>
+                            <div className="flex justify-between items-start">
+                                <div className="flex-1">
+                                    <span className="font-bold">{entry.organization || 'Company Name'}</span>
+                                    {entry.location && <span className="italic ml-2">{entry.location}</span>}
+                                </div>
+                                <span className="italic whitespace-nowrap ml-2">
+                                    {entry.start_date && entry.end_date ? `${entry.start_date} -- ${entry.end_date}` :
+                                        entry.start_date || entry.end_date || 'Dates'}
+                                </span>
+                            </div>
+                            {entry.title && (
+                                <div className="italic">{entry.title}</div>
+                            )}
+                            {entry.description && (
+                                <div className="mt-1 whitespace-pre-line" style={{ fontSize: '12px', lineHeight: '1.15' }}>
+                                    {entry.description}
+                                </div>
+                            )}
+                        </div>
+                    ))}
+                </div>
+            )}
+
+            {/* Projects */}
+            {sections[2].entries.length > 0 && (
+                <div className="mb-1.5">
+                    <h2 className="font-bold uppercase mb-0.5" style={{ fontSize: '14px', borderBottom: '0.5pt solid #000' }}>Projects</h2>
+                    {sections[2].entries.map((entry, idx) => (
+                        <div key={idx} className="mb-1" style={{ fontSize: '5pt' }}>
+                            <div className="flex justify-between items-start">
+                                <div className="flex-1">
+                                    <span className="font-bold">{entry.title || 'Project Name'}</span>
+                                    {entry.technologies && <span className="ml-2">| <span className="italic">{entry.technologies}</span></span>}
+                                </div>
+                                <span className="italic whitespace-nowrap ml-2">
+                                    {entry.start_date && entry.end_date ? `${entry.start_date} -- ${entry.end_date}` :
+                                        entry.start_date || entry.end_date || 'Dates'}
+                                </span>
+                            </div>
+                            {entry.description && (
+                                <div className="mt-1 whitespace-pre-line" style={{ fontSize: '12px', lineHeight: '1.15' }}>
+                                    {entry.description}
+                                </div>
+                            )}
+                        </div>
+                    ))}
+                </div>
+            )}
+
+            {/* Technical Skills */}
+            {sections[3].entries.length > 0 && (
+                <div className="mb-1.5">
+                    <h2 className="font-bold uppercase mb-0.5" style={{ fontSize: '14px', borderBottom: '0.5pt solid #000' }}>Technical Skills</h2>
+                    <div style={{ fontSize: '5pt' }}>
+                        {sections[3].entries.map((entry, idx) => (
+                            <div key={idx} className="mb-0.5">
+                                <span className="font-bold">{entry.title || 'Category'}: </span>
+                                <span>{entry.technologies || 'Skills here'}</span>
+                            </div>
+                        ))}
+                    </div>
+                </div>
+            )}
+
+            {/* Empty state */}
+            {sections.every(s => s.entries.length === 0) && !formData.full_name && (
+                <div className="text-center text-gray-400 py-6">
+                    <p style={{ fontSize: '6pt' }}>Start filling out the form to see your resume preview</p>
+                </div>
+            )}
+        </div>
+    );
+
+    const handleImportResume = async (e: ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+        if (!file) return;
+        try {
+            const parsed = await parseMutation.mutateAsync(file);
+            setFormData((prev) => ({
+                ...prev,
+                name: prev.name || parsed.resume.name || 'Imported Resume',
+                full_name: parsed.resume.full_name || prev.full_name,
+                email: parsed.resume.email || prev.email,
+                phone: parsed.resume.phone || prev.phone,
+                location: parsed.resume.location || prev.location,
+                linkedin_url: parsed.resume.linkedin_url || prev.linkedin_url,
+                portfolio_url: parsed.resume.portfolio_url || prev.portfolio_url,
+                github_url: parsed.resume.github_url || prev.github_url,
+                summary: parsed.resume.summary || prev.summary,
+                base_font_size: parsed.base_font_size || 11,
+            }));
+
+            const nextSections = createDefaultSections();
+            parsed.sections.forEach((section) => {
+                const index = nextSections.findIndex((s) => s.section_type === section.section_type);
+                if (index !== -1) {
+                    nextSections[index].entries = section.entries.map((entry, entryIndex) => ({
+                        title: entry.title || '',
+                        organization: entry.organization || '',
+                        location: entry.location || '',
+                        start_date: entry.start_date || '',
+                        end_date: entry.end_date || '',
+                        description: entry.description || '',
+                        technologies: entry.technologies || '',
+                        order: entry.order ?? entryIndex,
+                    }));
+                }
+            });
+            setSections(nextSections);
+
+            if (parsed.warnings?.length) {
+                parsed.warnings.forEach((warning) => addToast(warning, 'info'));
+            } else {
+                addToast('Resume parsed and form filled!', 'success');
+            }
+        } catch (error) {
+            console.error('Parse error:', error);
+            addToast('Failed to parse resume. Try a PDF, DOCX, or TXT file.', 'error');
+        } finally {
+            e.target.value = '';
+        }
+    };
 
     const handleChange = (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
         const { name, value, type } = e.target;
@@ -293,7 +521,22 @@ export default function MasterResumeForm() {
                     <form onSubmit={handleSubmit} className="space-y-6">
                         {/* Basic Info */}
                         <div className="card">
-                            <h2 className="text-xl font-semibold mb-4">Basic Information</h2>
+                            <div className="flex flex-wrap items-center justify-between gap-2 mb-4">
+                                <h2 className="text-xl font-semibold">Basic Information</h2>
+                                <label className="btn btn-secondary btn-sm cursor-pointer">
+                                    {parseMutation.isPending ? 'Parsing...' : 'Import Resume'}
+                                    <input
+                                        type="file"
+                                        accept=".pdf,.docx,.txt"
+                                        onChange={handleImportResume}
+                                        className="hidden"
+                                        disabled={parseMutation.isPending}
+                                    />
+                                </label>
+                            </div>
+                            <p className="text-xs text-gray-500 mb-4">
+                                Upload a resume to auto-fill the fields below. You can edit anything afterward.
+                            </p>
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                 <div className="md:col-span-2">
                                     <label className="label">Resume Template Name *</label>
@@ -343,6 +586,17 @@ export default function MasterResumeForm() {
                                     />
                                 </div>
                                 <div>
+                                    <label className="label">Location</label>
+                                    <input
+                                        type="text"
+                                        name="location"
+                                        value={formData.location}
+                                        onChange={handleChange}
+                                        className="input"
+                                        placeholder="City, State / Province"
+                                    />
+                                </div>
+                                <div>
                                     <label className="label">LinkedIn</label>
                                     <input
                                         type="url"
@@ -362,6 +616,28 @@ export default function MasterResumeForm() {
                                         onChange={handleChange}
                                         className="input"
                                         placeholder="https://github.com/johndoe"
+                                    />
+                                </div>
+                                <div className="md:col-span-2">
+                                    <label className="label">Portfolio</label>
+                                    <input
+                                        type="url"
+                                        name="portfolio_url"
+                                        value={formData.portfolio_url}
+                                        onChange={handleChange}
+                                        className="input"
+                                        placeholder="https://yourportfolio.com"
+                                    />
+                                </div>
+                                <div className="md:col-span-2">
+                                    <label className="label">Professional Summary</label>
+                                    <textarea
+                                        name="summary"
+                                        value={formData.summary}
+                                        onChange={handleChange}
+                                        className="input"
+                                        rows={4}
+                                        placeholder="Brief summary of your experience and goals"
                                     />
                                 </div>
                             </div>
@@ -765,137 +1041,67 @@ export default function MasterResumeForm() {
 
                 {/* Live Preview Section - Hidden on mobile, visible on tablet and desktop */}
                 <div className="hidden lg:block lg:sticky lg:top-4 h-fit lg:col-span-1">
-                    <div style={{ backgroundColor: '#525659', padding: '2rem', display: 'inline-block' }}>
-                        <div className="bg-white shadow-2xl" style={{
-                            width: '490px',  // 60% of actual size
-                            height: '634px',
-                            padding: '29px 32px',
-                            fontFamily: 'Computer Modern, Latin Modern Roman, serif',
-                            fontSize: '6.6pt',
-                            lineHeight: '1.2',
-                            overflow: 'hidden'
-                        }}>
-                            {/* Header */}
-                            <div className="text-center pb-1 mb-2" style={{ borderBottom: '0.9pt solid #000' }}>
-                                <h1 className="font-bold uppercase tracking-wider" style={{ fontSize: '12pt', marginBottom: '1pt' }}>
-                                    {formData.full_name || 'Your Name'}
-                                </h1>
-                                <div className="flex flex-wrap justify-center gap-0.5" style={{ fontSize: '6pt', marginTop: '1pt' }}>
-                                    {formData.phone && <span>{formData.phone}</span>}
-                                    {formData.phone && formData.email && <span className="mx-1">•</span>}
-                                    {formData.email && <span style={{ textDecoration: 'underline' }}>{formData.email}</span>}
-                                    {(formData.phone || formData.email) && formData.linkedin_url && <span className="mx-1">•</span>}
-                                    {formData.linkedin_url && <span style={{ textDecoration: 'underline', color: '#0000EE' }}>linkedin.com/in/...</span>}
-                                    {formData.linkedin_url && formData.github_url && <span className="mx-1">•</span>}
-                                    {formData.github_url && <span style={{ textDecoration: 'underline', color: '#0000EE' }}>github.com/...</span>}
-                                </div>
-                            </div>
-
-                            {/* Education */}
-                            {sections[0].entries.length > 0 && (
-                                <div className="mb-1.5">
-                                    <h2 className="font-bold uppercase mb-0.5" style={{ fontSize: '6pt', borderBottom: '0.5pt solid #000' }}>Education</h2>
-                                    {sections[0].entries.map((entry, idx) => (
-                                        <div key={idx} className="mb-1" style={{ fontSize: '5pt' }}>
-                                            <div className="flex justify-between items-start">
-                                                <div className="flex-1">
-                                                    <span className="font-bold">{entry.organization || 'Institution Name'}</span>
-                                                    {entry.location && <span className="italic ml-2">{entry.location}</span>}
-                                                </div>
-                                                <span className="italic whitespace-nowrap ml-2">
-                                                    {entry.start_date && entry.end_date ? `${entry.start_date} -- ${entry.end_date}` :
-                                                        entry.start_date || entry.end_date || 'Dates'}
-                                                </span>
-                                            </div>
-                                            {entry.title && (
-                                                <div className="italic">{entry.title}</div>
-                                            )}
-                                            {entry.description && (
-                                                <div className="mt-1 whitespace-pre-line" style={{ fontSize: '9.5pt', lineHeight: '1.15' }}>
-                                                    {entry.description}
-                                                </div>
-                                            )}
+                    <div
+                        ref={previewContainerRef}
+                        style={{
+                            backgroundColor: '#525659',
+                            padding: '2rem',
+                            display: 'block',
+                            width: '100%',
+                            boxSizing: 'border-box',
+                            maxHeight: 'calc(100vh - 6rem)',
+                            overflowY: 'auto',
+                            position: 'relative'
+                        }}
+                    >
+                        <div className="space-y-6">
+                            {Array.from({ length: pageCount }).map((_, pageIndex) => (
+                                <div
+                                    key={pageIndex}
+                                    className="bg-white shadow-2xl"
+                                    style={{
+                                        width: `${A4_WIDTH_PX * previewScale}px`,
+                                        height: `${A4_HEIGHT_PX * previewScale}px`,
+                                        boxSizing: 'border-box',
+                                        overflow: 'hidden'
+                                    }}
+                                >
+                                    <div
+                                        style={{
+                                            width: `${A4_WIDTH_PX}px`,
+                                            height: `${A4_HEIGHT_PX}px`,
+                                            padding: `${PAGE_PADDING_Y}px ${PAGE_PADDING_X}px`,
+                                            boxSizing: 'border-box',
+                                            transform: `scale(${previewScale})`,
+                                            transformOrigin: 'top left'
+                                        }}
+                                    >
+                                        <div style={{ transform: `translateY(-${pageIndex * PAGE_CONTENT_HEIGHT}px)` }}>
+                                            <ResumePreviewContent />
                                         </div>
-                                    ))}
-                                </div>
-                            )}
-
-                            {/* Experience */}
-                            {sections[1].entries.length > 0 && (
-                                <div className="mb-1.5">
-                                    <h2 className="font-bold uppercase mb-0.5" style={{ fontSize: '6pt', borderBottom: '0.5pt solid #000' }}>Experience</h2>
-                                    {sections[1].entries.map((entry, idx) => (
-                                        <div key={idx} className="mb-1" style={{ fontSize: '5pt' }}>
-                                            <div className="flex justify-between items-start">
-                                                <div className="flex-1">
-                                                    <span className="font-bold">{entry.organization || 'Company Name'}</span>
-                                                    {entry.location && <span className="italic ml-2">{entry.location}</span>}
-                                                </div>
-                                                <span className="italic whitespace-nowrap ml-2">
-                                                    {entry.start_date && entry.end_date ? `${entry.start_date} -- ${entry.end_date}` :
-                                                        entry.start_date || entry.end_date || 'Dates'}
-                                                </span>
-                                            </div>
-                                            {entry.title && (
-                                                <div className="italic">{entry.title}</div>
-                                            )}
-                                            {entry.description && (
-                                                <div className="mt-1 whitespace-pre-line" style={{ fontSize: '9.5pt', lineHeight: '1.15' }}>
-                                                    {entry.description}
-                                                </div>
-                                            )}
-                                        </div>
-                                    ))}
-                                </div>
-                            )}
-
-                            {/* Projects */}
-                            {sections[2].entries.length > 0 && (
-                                <div className="mb-1.5">
-                                    <h2 className="font-bold uppercase mb-0.5" style={{ fontSize: '6pt', borderBottom: '0.5pt solid #000' }}>Projects</h2>
-                                    {sections[2].entries.map((entry, idx) => (
-                                        <div key={idx} className="mb-1" style={{ fontSize: '5pt' }}>
-                                            <div className="flex justify-between items-start">
-                                                <div className="flex-1">
-                                                    <span className="font-bold">{entry.title || 'Project Name'}</span>
-                                                    {entry.technologies && <span className="ml-2">| <span className="italic">{entry.technologies}</span></span>}
-                                                </div>
-                                                <span className="italic whitespace-nowrap ml-2">
-                                                    {entry.start_date && entry.end_date ? `${entry.start_date} -- ${entry.end_date}` :
-                                                        entry.start_date || entry.end_date || 'Dates'}
-                                                </span>
-                                            </div>
-                                            {entry.description && (
-                                                <div className="mt-1 whitespace-pre-line" style={{ fontSize: '9.5pt', lineHeight: '1.15' }}>
-                                                    {entry.description}
-                                                </div>
-                                            )}
-                                        </div>
-                                    ))}
-                                </div>
-                            )}
-
-                            {/* Technical Skills */}
-                            {sections[3].entries.length > 0 && (
-                                <div className="mb-1.5">
-                                    <h2 className="font-bold uppercase mb-0.5" style={{ fontSize: '6pt', borderBottom: '0.5pt solid #000' }}>Technical Skills</h2>
-                                    <div style={{ fontSize: '5pt' }}>
-                                        {sections[3].entries.map((entry, idx) => (
-                                            <div key={idx} className="mb-0.5">
-                                                <span className="font-bold">{entry.title || 'Category'}: </span>
-                                                <span>{entry.technologies || 'Skills here'}</span>
-                                            </div>
-                                        ))}
                                     </div>
                                 </div>
-                            )}
+                            ))}
+                        </div>
 
-                            {/* Empty state */}
-                            {sections.every(s => s.entries.length === 0) && !formData.full_name && (
-                                <div className="text-center text-gray-400 py-6">
-                                    <p style={{ fontSize: '6pt' }}>Start filling out the form to see your resume preview</p>
-                                </div>
-                            )}
+                        <div
+                            aria-hidden
+                            style={{
+                                position: 'absolute',
+                                visibility: 'hidden',
+                                pointerEvents: 'none',
+                                top: 0,
+                                left: 0,
+                                height: 0,
+                                overflow: 'hidden'
+                            }}
+                        >
+                            <div
+                                ref={contentRef}
+                                style={{ width: `${A4_WIDTH_PX - PAGE_PADDING_X * 2}px` }}
+                            >
+                                <ResumePreviewContent />
+                            </div>
                         </div>
                     </div>
                 </div>

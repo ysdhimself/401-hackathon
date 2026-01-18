@@ -21,6 +21,9 @@ class MasterResume(models.Model):
     # Professional summary
     summary = models.TextField(blank=True, help_text="Professional summary or objective")
     
+    # Style settings (extracted from imported resume)
+    base_font_size = models.IntegerField(default=11, help_text="Base font size in pt (detected from imported resume)")
+    
     # Timestamps
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
