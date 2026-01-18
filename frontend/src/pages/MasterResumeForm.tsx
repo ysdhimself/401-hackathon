@@ -282,476 +282,624 @@ export default function MasterResumeForm() {
     }
 
     return (
-        <div className="container mx-auto py-8 max-w-6xl">
-            <h1 className="text-3xl font-bold mb-6">
+        <div className="py-8 px-4" style={{ maxWidth: '100%' }}>
+            <h1 className="text-3xl font-bold mb-6 px-4">
                 {isEdit ? 'Edit Master Resume' : 'Create Master Resume'}
             </h1>
 
-            <form onSubmit={handleSubmit} className="space-y-6">
-                {/* Basic Info */}
-                <div className="card">
-                    <h2 className="text-xl font-semibold mb-4">Basic Information</h2>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div className="md:col-span-2">
-                            <label className="label">Resume Template Name *</label>
-                            <input
-                                type="text"
-                                name="name"
-                                value={formData.name}
-                                onChange={handleChange}
-                                required
-                                placeholder="e.g., Software Engineer Resume"
-                                className="input"
-                            />
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                {/* Form Section */}
+                <div className="space-y-6 lg:col-span-2">
+                    <form onSubmit={handleSubmit} className="space-y-6">
+                        {/* Basic Info */}
+                        <div className="card">
+                            <h2 className="text-xl font-semibold mb-4">Basic Information</h2>
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div className="md:col-span-2">
+                                    <label className="label">Resume Template Name *</label>
+                                    <input
+                                        type="text"
+                                        name="name"
+                                        value={formData.name}
+                                        onChange={handleChange}
+                                        required
+                                        placeholder="e.g., Software Engineer Resume"
+                                        className="input"
+                                    />
+                                </div>
+                                <div>
+                                    <label className="label">Full Name *</label>
+                                    <input
+                                        type="text"
+                                        name="full_name"
+                                        value={formData.full_name}
+                                        onChange={handleChange}
+                                        required
+                                        className="input"
+                                        placeholder="John Doe"
+                                    />
+                                </div>
+                                <div>
+                                    <label className="label">Email *</label>
+                                    <input
+                                        type="email"
+                                        name="email"
+                                        value={formData.email}
+                                        onChange={handleChange}
+                                        required
+                                        className="input"
+                                        placeholder="john@example.com"
+                                    />
+                                </div>
+                                <div>
+                                    <label className="label">Phone Number</label>
+                                    <input
+                                        type="tel"
+                                        name="phone"
+                                        value={formData.phone}
+                                        onChange={handleChange}
+                                        className="input"
+                                        placeholder="+1 (555) 123-4567"
+                                    />
+                                </div>
+                                <div>
+                                    <label className="label">LinkedIn</label>
+                                    <input
+                                        type="url"
+                                        name="linkedin_url"
+                                        value={formData.linkedin_url}
+                                        onChange={handleChange}
+                                        className="input"
+                                        placeholder="https://linkedin.com/in/johndoe"
+                                    />
+                                </div>
+                                <div>
+                                    <label className="label">GitHub</label>
+                                    <input
+                                        type="url"
+                                        name="github_url"
+                                        value={formData.github_url}
+                                        onChange={handleChange}
+                                        className="input"
+                                        placeholder="https://github.com/johndoe"
+                                    />
+                                </div>
+                            </div>
                         </div>
-                        <div>
-                            <label className="label">Full Name *</label>
-                            <input
-                                type="text"
-                                name="full_name"
-                                value={formData.full_name}
-                                onChange={handleChange}
-                                required
-                                className="input"
-                                placeholder="John Doe"
-                            />
-                        </div>
-                        <div>
-                            <label className="label">Email *</label>
-                            <input
-                                type="email"
-                                name="email"
-                                value={formData.email}
-                                onChange={handleChange}
-                                required
-                                className="input"
-                                placeholder="john@example.com"
-                            />
-                        </div>
-                        <div>
-                            <label className="label">Phone Number</label>
-                            <input
-                                type="tel"
-                                name="phone"
-                                value={formData.phone}
-                                onChange={handleChange}
-                                className="input"
-                                placeholder="+1 (555) 123-4567"
-                            />
-                        </div>
-                        <div>
-                            <label className="label">LinkedIn</label>
-                            <input
-                                type="url"
-                                name="linkedin_url"
-                                value={formData.linkedin_url}
-                                onChange={handleChange}
-                                className="input"
-                                placeholder="https://linkedin.com/in/johndoe"
-                            />
-                        </div>
-                        <div>
-                            <label className="label">GitHub</label>
-                            <input
-                                type="url"
-                                name="github_url"
-                                value={formData.github_url}
-                                onChange={handleChange}
-                                className="input"
-                                placeholder="https://github.com/johndoe"
-                            />
-                        </div>
-                    </div>
-                </div>
 
-                {/* Education Section */}
-                <div className="card">
-                    <div className="flex justify-between items-center mb-4">
-                        <h2 className="text-xl font-semibold">Education</h2>
-                        <button
-                            type="button"
-                            onClick={() => addEntry(0)}
-                            className="btn btn-sm bg-blue-500 text-white hover:bg-blue-600"
-                        >
-                            + Add Education
-                        </button>
-                    </div>
-                    {sections[0].entries.map((entry, entryIdx) => (
-                        <div key={entryIdx} className="mb-6 p-4 border border-gray-200 rounded-lg bg-gray-50">
-                            <div className="flex justify-between items-start mb-3">
-                                <h3 className="font-semibold text-gray-700">Education #{entryIdx + 1}</h3>
+                        {/* Education Section */}
+                        <div className="card">
+                            <div className="flex justify-between items-center mb-4">
+                                <h2 className="text-xl font-semibold">Education</h2>
                                 <button
                                     type="button"
-                                    onClick={() => removeEntry(0, entryIdx)}
-                                    className="text-red-600 hover:text-red-800 text-sm"
+                                    onClick={() => addEntry(0)}
+                                    className="btn btn-sm bg-blue-500 text-white hover:bg-blue-600"
                                 >
-                                    Remove
+                                    + Add Education
                                 </button>
                             </div>
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                                <div>
-                                    <label className="label text-sm">Degree</label>
-                                    <input
-                                        type="text"
-                                        value={entry.title}
-                                        onChange={(e) => updateEntry(0, entryIdx, 'title', e.target.value)}
-                                        className="input input-sm"
-                                        placeholder="Bachelor of Science in Computer Science"
-                                    />
-                                </div>
-                                <div>
-                                    <label className="label text-sm">Institution</label>
-                                    <input
-                                        type="text"
-                                        value={entry.organization}
-                                        onChange={(e) => updateEntry(0, entryIdx, 'organization', e.target.value)}
-                                        className="input input-sm"
-                                        placeholder="University of Example"
-                                    />
-                                </div>
-                                <div>
-                                    <label className="label text-sm">Location</label>
-                                    <input
-                                        type="text"
-                                        value={entry.location}
-                                        onChange={(e) => updateEntry(0, entryIdx, 'location', e.target.value)}
-                                        className="input input-sm"
-                                        placeholder="City, Province"
-                                    />
-                                </div>
-                                <div className="grid grid-cols-2 gap-2">
-                                    <div>
-                                        <label className="label text-sm">Start Date</label>
-                                        <input
-                                            type="text"
-                                            value={entry.start_date}
-                                            onChange={(e) => updateEntry(0, entryIdx, 'start_date', e.target.value)}
-                                            className="input input-sm"
-                                            placeholder="Sep 2022"
-                                        />
-                                    </div>
-                                    <div>
-                                        <label className="label text-sm">End Date</label>
-                                        <input
-                                            type="text"
-                                            value={entry.end_date}
-                                            onChange={(e) => updateEntry(0, entryIdx, 'end_date', e.target.value)}
-                                            className="input input-sm"
-                                            placeholder="May 2026"
-                                        />
-                                    </div>
-                                </div>
-                                <div className="md:col-span-2">
-                                    <div className="flex justify-between items-center mb-1">
-                                        <label className="label text-sm">Details (Bullet Points)</label>
+                            {sections[0].entries.map((entry, entryIdx) => (
+                                <div key={entryIdx} className="mb-6 p-4 border border-gray-200 rounded-lg bg-gray-50">
+                                    <div className="flex justify-between items-start mb-3">
+                                        <h3 className="font-semibold text-gray-700">Education #{entryIdx + 1}</h3>
                                         <button
                                             type="button"
-                                            onClick={() => addBulletPoint(0, entryIdx)}
-                                            className="text-xs text-blue-600 hover:text-blue-800"
+                                            onClick={() => removeEntry(0, entryIdx)}
+                                            className="text-red-600 hover:text-red-800 text-sm"
                                         >
-                                            + Add Bullet
+                                            Remove
                                         </button>
                                     </div>
-                                    <textarea
-                                        value={entry.description}
-                                        onChange={(e) => updateEntry(0, entryIdx, 'description', e.target.value)}
-                                        className="input input-sm"
-                                        rows={4}
-                                        placeholder="• GPA: 3.8/4.0&#10;• Dean's List all semesters&#10;• Relevant coursework: Data Structures, Algorithms, Software Engineering"
-                                    />
+                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                                        <div>
+                                            <label className="label text-sm">Degree</label>
+                                            <input
+                                                type="text"
+                                                value={entry.title}
+                                                onChange={(e) => updateEntry(0, entryIdx, 'title', e.target.value)}
+                                                className="input input-sm"
+                                                placeholder="Bachelor of Science in Computer Science"
+                                            />
+                                        </div>
+                                        <div>
+                                            <label className="label text-sm">Institution</label>
+                                            <input
+                                                type="text"
+                                                value={entry.organization}
+                                                onChange={(e) => updateEntry(0, entryIdx, 'organization', e.target.value)}
+                                                className="input input-sm"
+                                                placeholder="University of Example"
+                                            />
+                                        </div>
+                                        <div>
+                                            <label className="label text-sm">Location</label>
+                                            <input
+                                                type="text"
+                                                value={entry.location}
+                                                onChange={(e) => updateEntry(0, entryIdx, 'location', e.target.value)}
+                                                className="input input-sm"
+                                                placeholder="City, Province"
+                                            />
+                                        </div>
+                                        <div className="flex gap-2">
+                                            <div style={{ width: '110px' }}>
+                                                <label className="label text-sm">Start Date</label>
+                                                <input
+                                                    type="text"
+                                                    value={entry.start_date}
+                                                    onChange={(e) => updateEntry(0, entryIdx, 'start_date', e.target.value)}
+                                                    className="input input-sm"
+                                                    style={{ width: '100px', minWidth: '100px', maxWidth: '100px' }}
+                                                    placeholder="Sep 2022"
+                                                />
+                                            </div>
+                                            <div style={{ width: '110px' }}>
+                                                <label className="label text-sm">End Date</label>
+                                                <input
+                                                    type="text"
+                                                    value={entry.end_date}
+                                                    onChange={(e) => updateEntry(0, entryIdx, 'end_date', e.target.value)}
+                                                    className="input input-sm"
+                                                    style={{ width: '100px', minWidth: '100px', maxWidth: '100px' }}
+                                                    placeholder="May 2026"
+                                                />
+                                            </div>
+                                        </div>
+                                        <div className="md:col-span-2">
+                                            <div className="flex justify-between items-center mb-1">
+                                                <label className="label text-sm">Details (Bullet Points)</label>
+                                                <button
+                                                    type="button"
+                                                    onClick={() => addBulletPoint(0, entryIdx)}
+                                                    className="text-xs text-blue-600 hover:text-blue-800"
+                                                >
+                                                    + Add Bullet
+                                                </button>
+                                            </div>
+                                            <textarea
+                                                value={entry.description}
+                                                onChange={(e) => updateEntry(0, entryIdx, 'description', e.target.value)}
+                                                className="input input-sm"
+                                                rows={4}
+                                                placeholder="• GPA: 3.8/4.0&#10;• Dean's List all semesters&#10;• Relevant coursework: Data Structures, Algorithms, Software Engineering"
+                                            />
+                                        </div>
+                                    </div>
                                 </div>
-                            </div>
+                            ))}
+                            {sections[0].entries.length === 0 && (
+                                <p className="text-gray-500 text-sm text-center py-4">No education entries yet. Click "Add Education" to get started.</p>
+                            )}
                         </div>
-                    ))}
-                    {sections[0].entries.length === 0 && (
-                        <p className="text-gray-500 text-sm text-center py-4">No education entries yet. Click "Add Education" to get started.</p>
-                    )}
-                </div>
 
-                {/* Experience Section */}
-                <div className="card">
-                    <div className="flex justify-between items-center mb-4">
-                        <h2 className="text-xl font-semibold">Experience</h2>
-                        <button
-                            type="button"
-                            onClick={() => addEntry(1)}
-                            className="btn btn-sm bg-blue-500 text-white hover:bg-blue-600"
-                        >
-                            + Add Experience
-                        </button>
-                    </div>
-                    {sections[1].entries.map((entry, entryIdx) => (
-                        <div key={entryIdx} className="mb-6 p-4 border border-gray-200 rounded-lg bg-gray-50">
-                            <div className="flex justify-between items-start mb-3">
-                                <h3 className="font-semibold text-gray-700">Experience #{entryIdx + 1}</h3>
+                        {/* Experience Section */}
+                        <div className="card">
+                            <div className="flex justify-between items-center mb-4">
+                                <h2 className="text-xl font-semibold">Experience</h2>
                                 <button
                                     type="button"
-                                    onClick={() => removeEntry(1, entryIdx)}
-                                    className="text-red-600 hover:text-red-800 text-sm"
+                                    onClick={() => addEntry(1)}
+                                    className="btn btn-sm bg-blue-500 text-white hover:bg-blue-600"
                                 >
-                                    Remove
+                                    + Add Experience
                                 </button>
                             </div>
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                                <div>
-                                    <label className="label text-sm">Job Title</label>
-                                    <input
-                                        type="text"
-                                        value={entry.title}
-                                        onChange={(e) => updateEntry(1, entryIdx, 'title', e.target.value)}
-                                        className="input input-sm"
-                                        placeholder="Software Engineer"
-                                    />
-                                </div>
-                                <div>
-                                    <label className="label text-sm">Company</label>
-                                    <input
-                                        type="text"
-                                        value={entry.organization}
-                                        onChange={(e) => updateEntry(1, entryIdx, 'organization', e.target.value)}
-                                        className="input input-sm"
-                                        placeholder="Tech Company Inc."
-                                    />
-                                </div>
-                                <div>
-                                    <label className="label text-sm">Location</label>
-                                    <input
-                                        type="text"
-                                        value={entry.location}
-                                        onChange={(e) => updateEntry(1, entryIdx, 'location', e.target.value)}
-                                        className="input input-sm"
-                                        placeholder="San Francisco, CA"
-                                    />
-                                </div>
-                                <div className="grid grid-cols-2 gap-2">
-                                    <div>
-                                        <label className="label text-sm">Start Date</label>
-                                        <input
-                                            type="text"
-                                            value={entry.start_date}
-                                            onChange={(e) => updateEntry(1, entryIdx, 'start_date', e.target.value)}
-                                            className="input input-sm"
-                                            placeholder="Jan 2022"
-                                        />
-                                    </div>
-                                    <div>
-                                        <label className="label text-sm">End Date</label>
-                                        <input
-                                            type="text"
-                                            value={entry.end_date}
-                                            onChange={(e) => updateEntry(1, entryIdx, 'end_date', e.target.value)}
-                                            className="input input-sm"
-                                            placeholder="Present"
-                                        />
-                                    </div>
-                                </div>
-                                <div className="md:col-span-2">
-                                    <div className="flex justify-between items-center mb-1">
-                                        <label className="label text-sm">Responsibilities & Achievements (Bullet Points)</label>
+                            {sections[1].entries.map((entry, entryIdx) => (
+                                <div key={entryIdx} className="mb-6 p-4 border border-gray-200 rounded-lg bg-gray-50">
+                                    <div className="flex justify-between items-start mb-3">
+                                        <h3 className="font-semibold text-gray-700">Experience #{entryIdx + 1}</h3>
                                         <button
                                             type="button"
-                                            onClick={() => addBulletPoint(1, entryIdx)}
-                                            className="text-xs text-blue-600 hover:text-blue-800"
+                                            onClick={() => removeEntry(1, entryIdx)}
+                                            className="text-red-600 hover:text-red-800 text-sm"
                                         >
-                                            + Add Bullet
+                                            Remove
                                         </button>
                                     </div>
-                                    <textarea
-                                        value={entry.description}
-                                        onChange={(e) => updateEntry(1, entryIdx, 'description', e.target.value)}
-                                        className="input input-sm"
-                                        rows={5}
-                                        placeholder="• Developed and maintained web applications using React and Node.js&#10;• Improved application performance by 40% through code optimization&#10;• Collaborated with cross-functional teams to deliver features on time"
-                                    />
+                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                                        <div>
+                                            <label className="label text-sm">Job Title</label>
+                                            <input
+                                                type="text"
+                                                value={entry.title}
+                                                onChange={(e) => updateEntry(1, entryIdx, 'title', e.target.value)}
+                                                className="input input-sm"
+                                                placeholder="Software Engineer"
+                                            />
+                                        </div>
+                                        <div>
+                                            <label className="label text-sm">Company</label>
+                                            <input
+                                                type="text"
+                                                value={entry.organization}
+                                                onChange={(e) => updateEntry(1, entryIdx, 'organization', e.target.value)}
+                                                className="input input-sm"
+                                                placeholder="Tech Company Inc."
+                                            />
+                                        </div>
+                                        <div>
+                                            <label className="label text-sm">Location</label>
+                                            <input
+                                                type="text"
+                                                value={entry.location}
+                                                onChange={(e) => updateEntry(1, entryIdx, 'location', e.target.value)}
+                                                className="input input-sm"
+                                                placeholder="San Francisco, CA"
+                                            />
+                                        </div>
+                                        <div className="flex gap-2">
+                                            <div style={{ width: '110px' }}>
+                                                <label className="label text-sm">Start Date</label>
+                                                <input
+                                                    type="text"
+                                                    value={entry.start_date}
+                                                    onChange={(e) => updateEntry(1, entryIdx, 'start_date', e.target.value)}
+                                                    className="input input-sm"
+                                                    style={{ width: '100px', minWidth: '100px', maxWidth: '100px' }}
+                                                    placeholder="Jan 2022"
+                                                />
+                                            </div>
+                                            <div style={{ width: '110px' }}>
+                                                <label className="label text-sm">End Date</label>
+                                                <input
+                                                    type="text"
+                                                    value={entry.end_date}
+                                                    onChange={(e) => updateEntry(1, entryIdx, 'end_date', e.target.value)}
+                                                    className="input input-sm"
+                                                    style={{ width: '100px', minWidth: '100px', maxWidth: '100px' }}
+                                                    placeholder="Present"
+                                                />
+                                            </div>
+                                        </div>
+                                        <div className="md:col-span-2">
+                                            <div className="flex justify-between items-center mb-1">
+                                                <label className="label text-sm">Responsibilities & Achievements (Bullet Points)</label>
+                                                <button
+                                                    type="button"
+                                                    onClick={() => addBulletPoint(1, entryIdx)}
+                                                    className="text-xs text-blue-600 hover:text-blue-800"
+                                                >
+                                                    + Add Bullet
+                                                </button>
+                                            </div>
+                                            <textarea
+                                                value={entry.description}
+                                                onChange={(e) => updateEntry(1, entryIdx, 'description', e.target.value)}
+                                                className="input input-sm"
+                                                rows={5}
+                                                placeholder="• Developed and maintained web applications using React and Node.js&#10;• Improved application performance by 40% through code optimization&#10;• Collaborated with cross-functional teams to deliver features on time"
+                                            />
+                                        </div>
+                                    </div>
                                 </div>
-                            </div>
+                            ))}
+                            {sections[1].entries.length === 0 && (
+                                <p className="text-gray-500 text-sm text-center py-4">No experience entries yet. Click "Add Experience" to get started.</p>
+                            )}
                         </div>
-                    ))}
-                    {sections[1].entries.length === 0 && (
-                        <p className="text-gray-500 text-sm text-center py-4">No experience entries yet. Click "Add Experience" to get started.</p>
-                    )}
-                </div>
 
-                {/* Projects Section */}
-                <div className="card">
-                    <div className="flex justify-between items-center mb-4">
-                        <h2 className="text-xl font-semibold">Projects</h2>
-                        <button
-                            type="button"
-                            onClick={() => addEntry(2)}
-                            className="btn btn-sm bg-blue-500 text-white hover:bg-blue-600"
-                        >
-                            + Add Project
-                        </button>
-                    </div>
-                    {sections[2].entries.map((entry, entryIdx) => (
-                        <div key={entryIdx} className="mb-6 p-4 border border-gray-200 rounded-lg bg-gray-50">
-                            <div className="flex justify-between items-start mb-3">
-                                <h3 className="font-semibold text-gray-700">Project #{entryIdx + 1}</h3>
+                        {/* Projects Section */}
+                        <div className="card">
+                            <div className="flex justify-between items-center mb-4">
+                                <h2 className="text-xl font-semibold">Projects</h2>
                                 <button
                                     type="button"
-                                    onClick={() => removeEntry(2, entryIdx)}
-                                    className="text-red-600 hover:text-red-800 text-sm"
+                                    onClick={() => addEntry(2)}
+                                    className="btn btn-sm bg-blue-500 text-white hover:bg-blue-600"
                                 >
-                                    Remove
+                                    + Add Project
                                 </button>
                             </div>
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                                <div>
-                                    <label className="label text-sm">Project Name</label>
-                                    <input
-                                        type="text"
-                                        value={entry.title}
-                                        onChange={(e) => updateEntry(2, entryIdx, 'title', e.target.value)}
-                                        className="input input-sm"
-                                        placeholder="E-commerce Platform"
-                                    />
-                                </div>
-                                <div>
-                                    <label className="label text-sm">Organization/Context</label>
-                                    <input
-                                        type="text"
-                                        value={entry.organization}
-                                        onChange={(e) => updateEntry(2, entryIdx, 'organization', e.target.value)}
-                                        className="input input-sm"
-                                        placeholder="Personal Project / Hackathon / Course"
-                                    />
-                                </div>
-                                <div>
-                                    <label className="label text-sm">Technologies</label>
-                                    <input
-                                        type="text"
-                                        value={entry.technologies}
-                                        onChange={(e) => updateEntry(2, entryIdx, 'technologies', e.target.value)}
-                                        className="input input-sm"
-                                        placeholder="React, Node.js, MongoDB, AWS"
-                                    />
-                                </div>
-                                <div className="grid grid-cols-2 gap-2">
-                                    <div>
-                                        <label className="label text-sm">Start Date</label>
-                                        <input
-                                            type="text"
-                                            value={entry.start_date}
-                                            onChange={(e) => updateEntry(2, entryIdx, 'start_date', e.target.value)}
-                                            className="input input-sm"
-                                            placeholder="Jun 2023"
-                                        />
-                                    </div>
-                                    <div>
-                                        <label className="label text-sm">End Date</label>
-                                        <input
-                                            type="text"
-                                            value={entry.end_date}
-                                            onChange={(e) => updateEntry(2, entryIdx, 'end_date', e.target.value)}
-                                            className="input input-sm"
-                                            placeholder="Aug 2023"
-                                        />
-                                    </div>
-                                </div>
-                                <div className="md:col-span-2">
-                                    <div className="flex justify-between items-center mb-1">
-                                        <label className="label text-sm">Project Description (Bullet Points)</label>
+                            {sections[2].entries.map((entry, entryIdx) => (
+                                <div key={entryIdx} className="mb-6 p-4 border border-gray-200 rounded-lg bg-gray-50">
+                                    <div className="flex justify-between items-start mb-3">
+                                        <h3 className="font-semibold text-gray-700">Project #{entryIdx + 1}</h3>
                                         <button
                                             type="button"
-                                            onClick={() => addBulletPoint(2, entryIdx)}
-                                            className="text-xs text-blue-600 hover:text-blue-800"
+                                            onClick={() => removeEntry(2, entryIdx)}
+                                            className="text-red-600 hover:text-red-800 text-sm"
                                         >
-                                            + Add Bullet
+                                            Remove
                                         </button>
                                     </div>
-                                    <textarea
-                                        value={entry.description}
-                                        onChange={(e) => updateEntry(2, entryIdx, 'description', e.target.value)}
-                                        className="input input-sm"
-                                        rows={4}
-                                        placeholder="• Built a full-stack e-commerce platform with user authentication and payment processing&#10;• Implemented responsive UI with React and Tailwind CSS&#10;• Deployed on AWS with CI/CD pipeline"
-                                    />
+                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                                        <div>
+                                            <label className="label text-sm">Project Name</label>
+                                            <input
+                                                type="text"
+                                                value={entry.title}
+                                                onChange={(e) => updateEntry(2, entryIdx, 'title', e.target.value)}
+                                                className="input input-sm"
+                                                placeholder="E-commerce Platform"
+                                            />
+                                        </div>
+                                        <div>
+                                            <label className="label text-sm">Organization/Context</label>
+                                            <input
+                                                type="text"
+                                                value={entry.organization}
+                                                onChange={(e) => updateEntry(2, entryIdx, 'organization', e.target.value)}
+                                                className="input input-sm"
+                                                placeholder="Personal Project / Hackathon / Course"
+                                            />
+                                        </div>
+                                        <div>
+                                            <label className="label text-sm">Technologies</label>
+                                            <input
+                                                type="text"
+                                                value={entry.technologies}
+                                                onChange={(e) => updateEntry(2, entryIdx, 'technologies', e.target.value)}
+                                                className="input input-sm"
+                                                placeholder="React, Node.js, MongoDB, AWS"
+                                            />
+                                        </div>
+                                        <div className="flex gap-2">
+                                            <div style={{ width: '110px' }}>
+                                                <label className="label text-sm">Start Date</label>
+                                                <input
+                                                    type="text"
+                                                    value={entry.start_date}
+                                                    onChange={(e) => updateEntry(2, entryIdx, 'start_date', e.target.value)}
+                                                    className="input input-sm"
+                                                    style={{ width: '100px', minWidth: '100px', maxWidth: '100px' }}
+                                                    placeholder="Jun 2023"
+                                                />
+                                            </div>
+                                            <div style={{ width: '110px' }}>
+                                                <label className="label text-sm">End Date</label>
+                                                <input
+                                                    type="text"
+                                                    value={entry.end_date}
+                                                    onChange={(e) => updateEntry(2, entryIdx, 'end_date', e.target.value)}
+                                                    className="input input-sm"
+                                                    style={{ width: '100px', minWidth: '100px', maxWidth: '100px' }}
+                                                    placeholder="Aug 2023"
+                                                />
+                                            </div>
+                                        </div>
+                                        <div className="md:col-span-2">
+                                            <div className="flex justify-between items-center mb-1">
+                                                <label className="label text-sm">Project Description (Bullet Points)</label>
+                                                <button
+                                                    type="button"
+                                                    onClick={() => addBulletPoint(2, entryIdx)}
+                                                    className="text-xs text-blue-600 hover:text-blue-800"
+                                                >
+                                                    + Add Bullet
+                                                </button>
+                                            </div>
+                                            <textarea
+                                                value={entry.description}
+                                                onChange={(e) => updateEntry(2, entryIdx, 'description', e.target.value)}
+                                                className="input input-sm"
+                                                rows={4}
+                                                placeholder="• Built a full-stack e-commerce platform with user authentication and payment processing&#10;• Implemented responsive UI with React and Tailwind CSS&#10;• Deployed on AWS with CI/CD pipeline"
+                                            />
+                                        </div>
+                                    </div>
                                 </div>
-                            </div>
+                            ))}
+                            {sections[2].entries.length === 0 && (
+                                <p className="text-gray-500 text-sm text-center py-4">No projects yet. Click "Add Project" to get started.</p>
+                            )}
                         </div>
-                    ))}
-                    {sections[2].entries.length === 0 && (
-                        <p className="text-gray-500 text-sm text-center py-4">No projects yet. Click "Add Project" to get started.</p>
-                    )}
-                </div>
 
-                {/* Technical Skills Section */}
-                <div className="card">
-                    <div className="flex justify-between items-center mb-4">
-                        <h2 className="text-xl font-semibold">Technical Skills</h2>
-                        <button
-                            type="button"
-                            onClick={() => addEntry(3)}
-                            className="btn btn-sm bg-blue-500 text-white hover:bg-blue-600"
-                        >
-                            + Add Skill Category
-                        </button>
-                    </div>
-                    {sections[3].entries.map((entry, entryIdx) => (
-                        <div key={entryIdx} className="mb-4 p-4 border border-gray-200 rounded-lg bg-gray-50">
-                            <div className="flex justify-between items-start mb-3">
-                                <h3 className="font-semibold text-gray-700">Skill Category #{entryIdx + 1}</h3>
+                        {/* Technical Skills Section */}
+                        <div className="card">
+                            <div className="flex justify-between items-center mb-4">
+                                <h2 className="text-xl font-semibold">Technical Skills</h2>
                                 <button
                                     type="button"
-                                    onClick={() => removeEntry(3, entryIdx)}
-                                    className="text-red-600 hover:text-red-800 text-sm"
+                                    onClick={() => addEntry(3)}
+                                    className="btn btn-sm bg-blue-500 text-white hover:bg-blue-600"
                                 >
-                                    Remove
+                                    + Add Skill Category
                                 </button>
                             </div>
-                            <div className="grid grid-cols-1 gap-3">
-                                <div>
-                                    <label className="label text-sm">Category</label>
-                                    <input
-                                        type="text"
-                                        value={entry.title}
-                                        onChange={(e) => updateEntry(3, entryIdx, 'title', e.target.value)}
-                                        className="input input-sm"
-                                        placeholder="Programming Languages / Frameworks / Tools / Databases"
-                                    />
+                            {sections[3].entries.map((entry, entryIdx) => (
+                                <div key={entryIdx} className="mb-4 p-4 border border-gray-200 rounded-lg bg-gray-50">
+                                    <div className="flex justify-between items-start mb-3">
+                                        <h3 className="font-semibold text-gray-700">Skill Category #{entryIdx + 1}</h3>
+                                        <button
+                                            type="button"
+                                            onClick={() => removeEntry(3, entryIdx)}
+                                            className="text-red-600 hover:text-red-800 text-sm"
+                                        >
+                                            Remove
+                                        </button>
+                                    </div>
+                                    <div className="grid grid-cols-1 gap-3">
+                                        <div>
+                                            <label className="label text-sm">Category</label>
+                                            <input
+                                                type="text"
+                                                value={entry.title}
+                                                onChange={(e) => updateEntry(3, entryIdx, 'title', e.target.value)}
+                                                className="input input-sm"
+                                                placeholder="Programming Languages / Frameworks / Tools / Databases"
+                                            />
+                                        </div>
+                                        <div>
+                                            <label className="label text-sm">Skills</label>
+                                            <input
+                                                type="text"
+                                                value={entry.technologies}
+                                                onChange={(e) => updateEntry(3, entryIdx, 'technologies', e.target.value)}
+                                                className="input input-sm"
+                                                placeholder="Python, JavaScript, TypeScript, Java, C++"
+                                            />
+                                            <p className="text-xs text-gray-500 mt-1">Separate skills with commas</p>
+                                        </div>
+                                    </div>
                                 </div>
-                                <div>
-                                    <label className="label text-sm">Skills</label>
-                                    <input
-                                        type="text"
-                                        value={entry.technologies}
-                                        onChange={(e) => updateEntry(3, entryIdx, 'technologies', e.target.value)}
-                                        className="input input-sm"
-                                        placeholder="Python, JavaScript, TypeScript, Java, C++"
-                                    />
-                                    <p className="text-xs text-gray-500 mt-1">Separate skills with commas</p>
-                                </div>
-                            </div>
+                            ))}
+                            {sections[3].entries.length === 0 && (
+                                <p className="text-gray-500 text-sm text-center py-4">No skill categories yet. Click "Add Skill Category" to get started.</p>
+                            )}
                         </div>
-                    ))}
-                    {sections[3].entries.length === 0 && (
-                        <p className="text-gray-500 text-sm text-center py-4">No skill categories yet. Click "Add Skill Category" to get started.</p>
-                    )}
+
+                        {/* Actions */}
+                        <div className="flex gap-4 sticky bottom-4 bg-white p-4 rounded-lg shadow-lg border border-gray-200">
+                            <button
+                                type="submit"
+                                disabled={createMutation.isPending || updateMutation.isPending}
+                                className="btn btn-primary flex-1"
+                            >
+                                {createMutation.isPending || updateMutation.isPending
+                                    ? 'Saving...'
+                                    : isEdit
+                                        ? 'Update Resume'
+                                        : 'Create Resume'}
+                            </button>
+                            <button
+                                type="button"
+                                onClick={() => navigate('/master-resumes')}
+                                className="btn btn-secondary"
+                            >
+                                Cancel
+                            </button>
+                        </div>
+                    </form>
                 </div>
 
-                {/* Actions */}
-                <div className="flex gap-4 sticky bottom-4 bg-white p-4 rounded-lg shadow-lg border border-gray-200">
-                    <button
-                        type="submit"
-                        disabled={createMutation.isPending || updateMutation.isPending}
-                        className="btn btn-primary flex-1"
-                    >
-                        {createMutation.isPending || updateMutation.isPending
-                            ? 'Saving...'
-                            : isEdit
-                                ? 'Update Resume'
-                                : 'Create Resume'}
-                    </button>
-                    <button
-                        type="button"
-                        onClick={() => navigate('/master-resumes')}
-                        className="btn btn-secondary"
-                    >
-                        Cancel
-                    </button>
+                {/* Live Preview Section - Hidden on mobile, visible on tablet and desktop */}
+                <div className="hidden lg:block lg:sticky lg:top-4 h-fit lg:col-span-1">
+                    <div style={{ backgroundColor: '#525659', padding: '2rem', display: 'inline-block' }}>
+                        <div className="bg-white shadow-2xl" style={{
+                            width: '490px',  // 60% of actual size
+                            height: '634px',
+                            padding: '29px 32px',
+                            fontFamily: 'Computer Modern, Latin Modern Roman, serif',
+                            fontSize: '6.6pt',
+                            lineHeight: '1.2',
+                            overflow: 'hidden'
+                        }}>
+                            {/* Header */}
+                            <div className="text-center pb-1 mb-2" style={{ borderBottom: '0.9pt solid #000' }}>
+                                <h1 className="font-bold uppercase tracking-wider" style={{ fontSize: '12pt', marginBottom: '1pt' }}>
+                                    {formData.full_name || 'Your Name'}
+                                </h1>
+                                <div className="flex flex-wrap justify-center gap-0.5" style={{ fontSize: '6pt', marginTop: '1pt' }}>
+                                    {formData.phone && <span>{formData.phone}</span>}
+                                    {formData.phone && formData.email && <span className="mx-1">•</span>}
+                                    {formData.email && <span style={{ textDecoration: 'underline' }}>{formData.email}</span>}
+                                    {(formData.phone || formData.email) && formData.linkedin_url && <span className="mx-1">•</span>}
+                                    {formData.linkedin_url && <span style={{ textDecoration: 'underline', color: '#0000EE' }}>linkedin.com/in/...</span>}
+                                    {formData.linkedin_url && formData.github_url && <span className="mx-1">•</span>}
+                                    {formData.github_url && <span style={{ textDecoration: 'underline', color: '#0000EE' }}>github.com/...</span>}
+                                </div>
+                            </div>
+
+                            {/* Education */}
+                            {sections[0].entries.length > 0 && (
+                                <div className="mb-1.5">
+                                    <h2 className="font-bold uppercase mb-0.5" style={{ fontSize: '6pt', borderBottom: '0.5pt solid #000' }}>Education</h2>
+                                    {sections[0].entries.map((entry, idx) => (
+                                        <div key={idx} className="mb-1" style={{ fontSize: '5pt' }}>
+                                            <div className="flex justify-between items-start">
+                                                <div className="flex-1">
+                                                    <span className="font-bold">{entry.organization || 'Institution Name'}</span>
+                                                    {entry.location && <span className="italic ml-2">{entry.location}</span>}
+                                                </div>
+                                                <span className="italic whitespace-nowrap ml-2">
+                                                    {entry.start_date && entry.end_date ? `${entry.start_date} -- ${entry.end_date}` :
+                                                        entry.start_date || entry.end_date || 'Dates'}
+                                                </span>
+                                            </div>
+                                            {entry.title && (
+                                                <div className="italic">{entry.title}</div>
+                                            )}
+                                            {entry.description && (
+                                                <div className="mt-1 whitespace-pre-line" style={{ fontSize: '9.5pt', lineHeight: '1.15' }}>
+                                                    {entry.description}
+                                                </div>
+                                            )}
+                                        </div>
+                                    ))}
+                                </div>
+                            )}
+
+                            {/* Experience */}
+                            {sections[1].entries.length > 0 && (
+                                <div className="mb-1.5">
+                                    <h2 className="font-bold uppercase mb-0.5" style={{ fontSize: '6pt', borderBottom: '0.5pt solid #000' }}>Experience</h2>
+                                    {sections[1].entries.map((entry, idx) => (
+                                        <div key={idx} className="mb-1" style={{ fontSize: '5pt' }}>
+                                            <div className="flex justify-between items-start">
+                                                <div className="flex-1">
+                                                    <span className="font-bold">{entry.organization || 'Company Name'}</span>
+                                                    {entry.location && <span className="italic ml-2">{entry.location}</span>}
+                                                </div>
+                                                <span className="italic whitespace-nowrap ml-2">
+                                                    {entry.start_date && entry.end_date ? `${entry.start_date} -- ${entry.end_date}` :
+                                                        entry.start_date || entry.end_date || 'Dates'}
+                                                </span>
+                                            </div>
+                                            {entry.title && (
+                                                <div className="italic">{entry.title}</div>
+                                            )}
+                                            {entry.description && (
+                                                <div className="mt-1 whitespace-pre-line" style={{ fontSize: '9.5pt', lineHeight: '1.15' }}>
+                                                    {entry.description}
+                                                </div>
+                                            )}
+                                        </div>
+                                    ))}
+                                </div>
+                            )}
+
+                            {/* Projects */}
+                            {sections[2].entries.length > 0 && (
+                                <div className="mb-1.5">
+                                    <h2 className="font-bold uppercase mb-0.5" style={{ fontSize: '6pt', borderBottom: '0.5pt solid #000' }}>Projects</h2>
+                                    {sections[2].entries.map((entry, idx) => (
+                                        <div key={idx} className="mb-1" style={{ fontSize: '5pt' }}>
+                                            <div className="flex justify-between items-start">
+                                                <div className="flex-1">
+                                                    <span className="font-bold">{entry.title || 'Project Name'}</span>
+                                                    {entry.technologies && <span className="ml-2">| <span className="italic">{entry.technologies}</span></span>}
+                                                </div>
+                                                <span className="italic whitespace-nowrap ml-2">
+                                                    {entry.start_date && entry.end_date ? `${entry.start_date} -- ${entry.end_date}` :
+                                                        entry.start_date || entry.end_date || 'Dates'}
+                                                </span>
+                                            </div>
+                                            {entry.description && (
+                                                <div className="mt-1 whitespace-pre-line" style={{ fontSize: '9.5pt', lineHeight: '1.15' }}>
+                                                    {entry.description}
+                                                </div>
+                                            )}
+                                        </div>
+                                    ))}
+                                </div>
+                            )}
+
+                            {/* Technical Skills */}
+                            {sections[3].entries.length > 0 && (
+                                <div className="mb-1.5">
+                                    <h2 className="font-bold uppercase mb-0.5" style={{ fontSize: '6pt', borderBottom: '0.5pt solid #000' }}>Technical Skills</h2>
+                                    <div style={{ fontSize: '5pt' }}>
+                                        {sections[3].entries.map((entry, idx) => (
+                                            <div key={idx} className="mb-0.5">
+                                                <span className="font-bold">{entry.title || 'Category'}: </span>
+                                                <span>{entry.technologies || 'Skills here'}</span>
+                                            </div>
+                                        ))}
+                                    </div>
+                                </div>
+                            )}
+
+                            {/* Empty state */}
+                            {sections.every(s => s.entries.length === 0) && !formData.full_name && (
+                                <div className="text-center text-gray-400 py-6">
+                                    <p style={{ fontSize: '6pt' }}>Start filling out the form to see your resume preview</p>
+                                </div>
+                            )}
+                        </div>
+                    </div>
                 </div>
-            </form>
+            </div>
         </div>
     );
 }

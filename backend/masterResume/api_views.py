@@ -114,7 +114,14 @@ class MasterResumeViewSet(viewsets.ModelViewSet):
                 pdf_content = response.content
                 
                 http_response = HttpResponse(pdf_content, content_type='application/pdf')
-                http_response['Content-Disposition'] = f'attachment; filename="{resume.name.replace(" ", "_")}.pdf"'
+                
+                # Check if download parameter is present
+                if request.query_params.get('download') == 'true':
+                    http_response['Content-Disposition'] = f'attachment; filename="{resume.name.replace(" ", "_")}.pdf"'
+                else:
+                    # Inline display for preview
+                    http_response['Content-Disposition'] = f'inline; filename="{resume.name.replace(" ", "_")}.pdf"'
+                
                 return http_response
             else:
                 return Response(
